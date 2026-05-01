@@ -1,13 +1,15 @@
+import Link from "next/link";
+
 export default function HeaderPC() {
   return (
-    <header className="h-20 border-b border-black/10 px-8 flex items-center justify-between">
-      <div className="text-sm font-medium tracking-[0.28em] uppercase">
+    <header className="flex h-20 items-center justify-between border-b border-black/10 px-8">
+      <Link href="/pc" className="text-sm font-medium uppercase tracking-[0.28em]">
         Cattleya
-      </div>
+      </Link>
 
       <nav className="flex items-center gap-8 text-xs uppercase tracking-[0.18em]">
-        <a href="/pc">Accueil</a>
-        <a href="/pc/collection/parfums">Parfums</a>
+        <Link href="/pc">Accueil</Link>
+        <Link href="/pc/collection/parfums">Parfums</Link>
       </nav>
     </header>
   );

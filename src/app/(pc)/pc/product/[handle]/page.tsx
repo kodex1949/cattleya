@@ -1,5 +1,13 @@
 import { getProductByHandle } from "@/lib/shopify/products";
-export default async function Page({ params }: { params: { handle: string } }) {
-  const p = await getProductByHandle(params.handle);
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}) {
+  const { handle } = await params;
+
+  const p = await getProductByHandle(handle);
+
   return <div>PC: {p?.title}</div>;
 }

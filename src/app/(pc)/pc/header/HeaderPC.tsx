@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function HeaderPC() {
   return (
-    <header className="flex h-20 items-center justify-between border-b border-black/10 px-8">
+    <header className="fixed left-0 top-0 z-50 flex h-20 w-full items-center justify-between border-b border-black/10 bg-white px-8">
       <Link href="/pc" className="text-sm font-medium uppercase tracking-[0.28em]">
-        Cattleya
+        CATTLEYA
       </Link>
 
       <nav className="flex items-center gap-8 text-xs uppercase tracking-[0.18em]">

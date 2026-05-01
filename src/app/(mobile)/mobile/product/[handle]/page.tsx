@@ -4,9 +4,11 @@ import ProductMobileCattleya from "@/components/mobile/cattleya/product/ProductM
 export default async function ProductPage({
   params,
 }: {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }) {
-  const product = await getProductByHandle(params.handle);
+  const { handle } = await params;
+
+  const product = await getProductByHandle(handle);
 
   if (!product) return <div className="p-5">Produit introuvable</div>;
 

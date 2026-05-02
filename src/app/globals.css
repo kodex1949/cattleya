@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: sans-serif;
+
+  --background: #ffffff;
+  --foreground: #111111;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-sans {
+  font-family: var(--font-sans), sans-serif;
+}
+
+@layer components {
+  .type-hero {
+    @apply font-sans text-[44px] leading-[0.9] tracking-[-0.045em];
+  }
+
+  .type-section-title {
+    @apply font-sans text-[36px] leading-[0.94] tracking-[-0.05em];
+  }
+
+  .type-card-title {
+    @apply font-sans text-[28px] leading-[0.95] tracking-[-0.055em];
+  }
+
+  .type-body {
+    @apply font-sans text-[14px] leading-6 tracking-[-0.01em];
+  }
+
+  .type-small {
+    @apply font-sans text-[13px] leading-6 tracking-[-0.01em];
+  }
+
+  .type-label {
+    @apply font-sans text-[10px] uppercase tracking-[0.28em];
+  }
+
+  .type-label-soft {
+    @apply font-sans text-[10px] uppercase tracking-[0.22em];
+  }
+
+  .type-price {
+    @apply font-sans text-[12px] font-medium uppercase tracking-[0.08em];
+  }
+
+  .type-cta {
+    @apply font-sans text-[11px] font-medium uppercase tracking-[0.18em];
+  }
+
+  .type-meta {
+    @apply font-sans text-[11px] uppercase tracking-[0.18em];
+  }
+}

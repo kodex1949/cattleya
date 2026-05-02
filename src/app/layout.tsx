@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
 import { Space_Grotesk } from "next/font/google";
 
 const spaceGrotesk = Space_Grotesk({
@@ -20,15 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={spaceGrotesk.variable}>
-      <body
-        className="
-          min-h-screen
-          bg-white
-          text-black
-          antialiased
-          font-sans
-        "
-      >
+      <body className="min-h-screen bg-white text-black antialiased font-sans">
         {children}
       </body>
     </html>

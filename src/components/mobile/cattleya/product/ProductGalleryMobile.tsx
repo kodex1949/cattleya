@@ -25,7 +25,7 @@ export default function ProductGalleryMobile({
   vendor,
 }: ProductGalleryMobileProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hideTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const hideTimerRef = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   const [isMuted, setIsMuted] = useState(true);
@@ -63,7 +63,7 @@ export default function ProductGalleryMobile({
 
   useEffect(() => {
     return () => {
-      if (hideTimerRef.current) {
+      if (hideTimerRef.current !== null) {
         window.clearTimeout(hideTimerRef.current);
       }
     };
@@ -74,7 +74,7 @@ export default function ProductGalleryMobile({
 
     setShowControls(true);
 
-    if (hideTimerRef.current) {
+    if (hideTimerRef.current !== null) {
       window.clearTimeout(hideTimerRef.current);
     }
 
@@ -208,83 +208,18 @@ export default function ProductGalleryMobile({
           <button
             type="button"
             onClick={togglePlay}
-            aria-label={isPlaying ? "Pause vidéo" : "Lire vidéo"}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300 active:scale-95"
+            className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-2xl"
           >
-            <span className="absolute inset-[5px] rounded-full border border-white/10" />
-
-            {isPlaying ? (
-              <span className="relative flex h-4 w-4 items-center justify-center gap-[3px]">
-                <span className="h-4 w-[3px] rounded-full bg-white" />
-                <span className="h-4 w-[3px] rounded-full bg-white" />
-              </span>
-            ) : (
-              <span className="relative ml-[2px] h-0 w-0 border-y-[7px] border-l-[11px] border-y-transparent border-l-white" />
-            )}
+            {isPlaying ? "❚❚" : "▶"}
           </button>
 
           <button
             type="button"
             onClick={toggleMute}
-            aria-label={isMuted ? "Activer le son" : "Couper le son"}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300 active:scale-95"
+            className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-2xl"
           >
-            <span className="absolute inset-[5px] rounded-full border border-white/10" />
-
-            <span className="relative flex items-center">
-              <span className="h-3 w-2 rounded-[2px] bg-white" />
-              <span className="h-5 w-3 border-y-[5px] border-l-[8px] border-y-transparent border-l-white" />
-
-              {!isMuted && (
-                <span className="ml-1 flex gap-[2px]">
-                  <span className="h-2 w-[2px] rounded-full bg-white/70" />
-                  <span className="h-3 w-[2px] rounded-full bg-white" />
-                  <span className="h-4 w-[2px] rounded-full bg-white/70" />
-                </span>
-              )}
-
-              {isMuted && (
-                <span className="absolute left-1/2 top-1/2 h-px w-7 -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] bg-white" />
-              )}
-            </span>
+            {isMuted ? "🔇" : "🔊"}
           </button>
-        </div>
-      )}
-
-      <div className="absolute bottom-12 left-5 right-5 z-10 text-white">
-        <p className="mb-5 text-[9px] uppercase tracking-[0.52em] text-white/62">
-          Haute parfumerie
-        </p>
-
-        <h2 className="max-w-[335px] text-[46px] font-light leading-[0.84] tracking-[-0.095em]">
-          Une présence qui laisse une trace.
-        </h2>
-
-        <div className="mt-7 flex items-center gap-4">
-          <div className="h-px w-16 bg-white/42" />
-          <p className="text-[10px] uppercase tracking-[0.32em] text-white/55">
-            {String(safeIndex + 1).padStart(2, "0")} /{" "}
-            {String(Math.max(safeMedia.length, 1)).padStart(2, "0")}
-          </p>
-        </div>
-      </div>
-
-      {safeMedia.length > 1 && (
-        <div className="absolute bottom-9 right-5 z-20 flex items-center gap-1.5">
-          {safeMedia.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                goTo(index);
-              }}
-              aria-label={`Visuel ${index + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                index === safeIndex ? "w-10 bg-white" : "w-1.5 bg-white/35"
-              }`}
-            />
-          ))}
         </div>
       )}
     </section>

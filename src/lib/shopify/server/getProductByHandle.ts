@@ -1,6 +1,7 @@
 import "server-only";
 
 import { shopifyServerFetch } from "../server-client";
+import type { ProductMobileData } from "@/components/mobile/cattleya/product/product.types";
 
 const GET_PRODUCT_QUERY = `
 query getProductByHandle($handle: String!) {
@@ -85,8 +86,14 @@ query getProductByHandle($handle: String!) {
 }
 `;
 
-export async function getProductByHandle(handle: string) {
-  const data = await shopifyServerFetch({
+type GetProductByHandleResponse = {
+  product: ProductMobileData | null;
+};
+
+export async function getProductByHandle(
+  handle: string
+): Promise<ProductMobileData | null> {
+  const data = await shopifyServerFetch<GetProductByHandleResponse>({
     query: GET_PRODUCT_QUERY,
     variables: { handle },
   });

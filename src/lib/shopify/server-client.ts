@@ -1,6 +1,6 @@
 import "server-only";
 
-type ShopifyFetchParams<TVariables extends Record<string, unknown> | undefined> = {
+type ShopifyFetchParams<TVariables = Record<string, unknown>> = {
   query: string;
   variables?: TVariables;
   cache?: RequestCache;
@@ -16,7 +16,7 @@ type ShopifyResponse<TData> = {
 
 export async function shopifyServerFetch<
   TData,
-  TVariables extends Record<string, unknown> | undefined = undefined
+  TVariables = Record<string, unknown>
 >({
   query,
   variables,
@@ -56,7 +56,7 @@ export async function shopifyServerFetch<
     const body = await response.text();
 
     throw new Error(
-      `Shopify Storefront request failed: ${response.status} ${response.statusText} - ${body}`,
+      `Shopify Storefront request failed: ${response.status} ${response.statusText} - ${body}`
     );
   }
 

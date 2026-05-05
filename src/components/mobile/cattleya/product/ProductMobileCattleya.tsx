@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ProductMobileData } from "./product.types";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import ProductGalleryMobile from "./ProductGalleryMobile";
 import ProductOptionSelectorMobile from "./ProductOptionSelectorMobile";
@@ -27,6 +29,8 @@ type ProductMobileCattleyaProps = {
 export default function ProductMobileCattleya({
   product,
 }: ProductMobileCattleyaProps) {
+  const contentRef = useRef<HTMLElement | null>(null);
+
   const media = useMemo(() => {
     const images = getProductImages(product);
     return Array.isArray(images) ? images : [];
@@ -43,6 +47,38 @@ export default function ProductMobileCattleya({
   );
 
   const [activeMedia, setActiveMedia] = useState(0);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const content = contentRef.current;
+    if (!content) return;
+
+    const items = content.querySelectorAll("[data-product-reveal]");
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        items,
+        {
+          y: 54,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: content,
+            start: "top 82%",
+          },
+        }
+      );
+    }, content);
+
+    return () => ctx.revert();
+  }, []);
 
   const price = selectedVariant
     ? formatProductPrice(
@@ -76,8 +112,8 @@ export default function ProductMobileCattleya({
         vendor={product.vendor}
       />
 
-      <section className="px-5 pt-8">
-        <div className="text-center">
+      <section ref={contentRef} className="px-5 pt-8">
+        <div data-product-reveal className="text-center">
           <p className="text-[10px] uppercase tracking-[0.42em] text-black/38">
             Parfums
           </p>
@@ -102,7 +138,7 @@ export default function ProductMobileCattleya({
         </div>
 
         {optionGroups.length > 0 && (
-          <div className="mt-9">
+          <div data-product-reveal className="mt-9">
             <ProductOptionSelectorMobile
               optionGroups={optionGroups}
               selections={selections}
@@ -111,7 +147,7 @@ export default function ProductMobileCattleya({
           </div>
         )}
 
-        <div className="mt-8">
+        <div data-product-reveal className="mt-8">
           <button
             disabled={!isAvailable}
             className="flex h-[58px] w-full items-center justify-between bg-[#1b1713] px-5 text-white transition-all duration-300 active:scale-[0.985] disabled:bg-black/25 disabled:text-white/50"
@@ -132,15 +168,17 @@ export default function ProductMobileCattleya({
           </button>
         </div>
 
-        <div className="mt-8">
+        <div data-product-reveal className="mt-8">
           <ProductPersonalisationMobile />
         </div>
 
-        <div className="mt-8">
+        <div data-product-reveal className="mt-8">
           <ProductServiceActionsMobile />
         </div>
 
-        <ProductPanelsMobile description={product.description} />
+        <div data-product-reveal>
+          <ProductPanelsMobile description={product.description} />
+        </div>
       </section>
 
       <ProductStickyBarMobile variant={selectedVariant} />

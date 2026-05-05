@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ProductMobileData } from "./product.types";
 
 import ProductGalleryMobile from "./ProductGalleryMobile";
 import ProductOptionSelectorMobile from "./ProductOptionSelectorMobile";
@@ -20,12 +21,7 @@ import {
 } from "./product.utils";
 
 type ProductMobileCattleyaProps = {
-  product: {
-    title?: string;
-    vendor?: string | null;
-    description?: string | null;
-    [key: string]: unknown;
-  };
+  product: ProductMobileData;
 };
 
 export default function ProductMobileCattleya({

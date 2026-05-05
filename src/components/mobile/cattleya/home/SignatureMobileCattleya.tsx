@@ -1,42 +1,93 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
-export default function SignatureMobileCattleya() {
+type MemberExclusiveMedia = {
+  type: "image" | "video";
+  url: string;
+  alt?: string | null;
+};
+
+type SignatureMobileCattleyaProps = {
+  media?: MemberExclusiveMedia | null;
+};
+
+const SUPABASE_EXCLUSIVE_IMAGE =
+  "https://TON-PROJET.supabase.co/storage/v1/object/public/exclusive/membre.png";
+
+export default function SignatureMobileCattleya({
+  media,
+}: SignatureMobileCattleyaProps) {
+  const resolvedMedia: MemberExclusiveMedia = media ?? {
+    type: "image",
+    url: SUPABASE_EXCLUSIVE_IMAGE,
+    alt: "Exclusivité membres Cattleya",
+  };
+
+  const isVideo = resolvedMedia.type === "video";
+
   return (
-    <section className="relative bg-[#f8f5ef] px-6 py-24 text-center text-black overflow-hidden">
-      {/* BACKGROUND GLOW */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#e8dfd3] blur-[120px]" />
-
-      {/* CONTENT */}
+    <section className="bg-[#f7f6f2] px-5 py-24 text-black">
       <motion.div
-        initial={{ opacity: 0, y: 26 }}
+        initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 mx-auto max-w-[320px]"
+        className="mx-auto max-w-[420px]"
       >
-        {/* MICRO LABEL */}
-        <p className="text-[9px] uppercase tracking-[0.38em] text-black/30">
-          Signature
-        </p>
+        {/* IMAGE */}
+        <div className="relative overflow-hidden bg-[#eae6df]">
+          <div className="h-[480px] w-full">
+            {isVideo ? (
+              <video
+                src={resolvedMedia.url}
+                className="h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            ) : (
+              <img
+                src={resolvedMedia.url}
+                alt={resolvedMedia.alt ?? ""}
+                className="h-full w-full object-cover"
+              />
+            )}
+          </div>
+        </div>
 
-        {/* MAIN TEXT */}
-        <h2 className="mt-6 text-[32px] font-light leading-[1.15] tracking-[-0.05em]">
-          Une empreinte
-          <br />
-          invisible.
-        </h2>
+        {/* TEXT BLOCK */}
+        <div className="mt-10">
+          <p className="text-[9px] uppercase tracking-[0.42em] text-black/35">
+            Exclusivité membres
+          </p>
 
-        {/* SUB TEXT */}
-        <p className="mt-6 text-[14px] leading-7 text-black/50">
-          Chaque fragrance Cattleya est pensée comme une présence silencieuse,
-          un souvenir qui reste.
-        </p>
+          <h2 className="mt-4 text-[40px] font-light leading-[0.9] tracking-[-0.06em]">
+            Accès privé aux créations.
+          </h2>
 
-        {/* LINE */}
-        <div className="mt-10 flex justify-center">
-          <span className="h-px w-12 bg-black/12" />
+          <p className="mt-5 text-[14px] leading-7 text-black/55">
+            Une sélection confidentielle, réservée aux membres de la maison.
+          </p>
+
+          {/* CTA */}
+          <div className="mt-8 flex items-center gap-6">
+            <Link
+              href="/mobile/account"
+              className="text-[11px] uppercase tracking-[0.24em] underline underline-offset-4"
+            >
+              Devenir membre
+            </Link>
+
+            <Link
+              href="/mobile/sign-in"
+              className="text-[11px] uppercase tracking-[0.24em] text-black/50"
+            >
+              Connexion
+            </Link>
+          </div>
         </div>
       </motion.div>
     </section>

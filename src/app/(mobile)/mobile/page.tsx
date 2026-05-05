@@ -5,6 +5,7 @@ import VideoSectionMobileCattleya from "@/components/mobile/cattleya/home/VideoS
 import FeatureProductMobileCattleya from "@/components/mobile/cattleya/home/FeatureProductMobileCattleya";
 
 import { getActiveHeroContent } from "@/lib/cattleya/hero/get-active-hero-content";
+import { getMemberExclusive } from "@/lib/cattleya/member/get-member-exclusive";
 import { mapProductToManifest } from "@/lib/shopify/mappers/mapProductToManifest";
 import { getCollectionProducts } from "@/lib/shopify/queries/getCollectionProducts";
 
@@ -12,6 +13,7 @@ type ManifestProduct = ReturnType<typeof mapProductToManifest>;
 
 export default async function MobilePage() {
   const hero = await getActiveHeroContent();
+  const memberExclusive = await getMemberExclusive();
 
   let manifestProducts: ManifestProduct[] = [];
   let errorMessage: string | null = null;
@@ -26,7 +28,6 @@ export default async function MobilePage() {
 
   return (
     <>
-      {/* HERO */}
       {hero ? (
         <HeroMobileCattleya data={hero} />
       ) : (
@@ -35,23 +36,29 @@ export default async function MobilePage() {
         </div>
       )}
 
-      {/* MANIFEST */}
       {errorMessage ? (
         <div className="px-5 py-10 text-red-600">{errorMessage}</div>
       ) : (
         <ManifestMobileCattleya products={manifestProducts} />
       )}
 
-      {/* SIGNATURE */}
-      <SignatureMobileCattleya />
+      <SignatureMobileCattleya
+        media={
+          memberExclusive
+            ? {
+                type: memberExclusive.media_type,
+                url: memberExclusive.media_url,
+                alt: "Exclusivité membres Cattleya",
+              }
+            : null
+        }
+      />
 
-      {/* VIDEO */}
       <VideoSectionMobileCattleya />
 
-      {/* FEATURE PRODUCT */}
-      <FeatureProductMobileCattleya
-        product={manifestProducts[0]}
-      />
+      {manifestProducts[0] && (
+        <FeatureProductMobileCattleya product={manifestProducts[0]} />
+      )}
     </>
   );
 }

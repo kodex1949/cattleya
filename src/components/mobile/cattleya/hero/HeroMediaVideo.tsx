@@ -17,11 +17,21 @@ export default function HeroMediaVideo({
     const video = videoRef.current;
     if (!video) return;
 
-    // config iOS autoplay
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
     video.loop = true;
+
+    async function playVideo() {
+      const currentVideo = videoRef.current;
+      if (!currentVideo) return;
+
+      try {
+        await currentVideo.play();
+      } catch {
+        // Safari/iOS peut bloquer temporairement l’autoplay.
+      }
+    }
 
     if (!isActive) {
       video.pause();
@@ -29,24 +39,19 @@ export default function HeroMediaVideo({
       return;
     }
 
-    const tryPlay = async () => {
-      try {
-        await video.play();
-      } catch (error) {
-        console.error("Hero video autoplay failed:", error);
-      }
-    };
+    void playVideo();
 
-    // tentative immédiate
-    void tryPlay();
+    const firstRetry = window.setTimeout(() => {
+      void playVideo();
+    }, 160);
 
-    // retry pour Safari iPhone
-    const t1 = window.setTimeout(tryPlay, 120);
-    const t2 = window.setTimeout(tryPlay, 500);
+    const secondRetry = window.setTimeout(() => {
+      void playVideo();
+    }, 600);
 
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
+      window.clearTimeout(firstRetry);
+      window.clearTimeout(secondRetry);
     };
   }, [isActive, url]);
 
@@ -62,7 +67,7 @@ export default function HeroMediaVideo({
         preload="metadata"
         controls={false}
         disablePictureInPicture
-        className="h-full w-full object-cover select-none"
+        className="h-full w-full select-none object-cover"
       />
     </div>
   );

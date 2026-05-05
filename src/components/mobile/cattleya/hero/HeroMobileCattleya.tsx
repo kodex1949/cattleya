@@ -39,7 +39,6 @@ export default function HeroMobileCattleya({
   const autoplayTimeoutRef = useRef<number | null>(null);
   const resumeTimeoutRef = useRef<number | null>(null);
   const scrollEndTimeoutRef = useRef<number | null>(null);
-
   const autoplayEnabledRef = useRef(true);
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -51,30 +50,30 @@ export default function HeroMobileCattleya({
     return data.media[activeIndex] ?? data.media[0];
   }, [activeIndex, data.media, totalSlides]);
 
-  const clearAutoplayTimeout = () => {
-    if (autoplayTimeoutRef.current) {
+  function clearAutoplayTimeout() {
+    if (autoplayTimeoutRef.current !== null) {
       window.clearTimeout(autoplayTimeoutRef.current);
       autoplayTimeoutRef.current = null;
     }
-  };
+  }
 
-  const clearResumeTimeout = () => {
-    if (resumeTimeoutRef.current) {
+  function clearResumeTimeout() {
+    if (resumeTimeoutRef.current !== null) {
       window.clearTimeout(resumeTimeoutRef.current);
       resumeTimeoutRef.current = null;
     }
-  };
+  }
 
-  const clearScrollEndTimeout = () => {
-    if (scrollEndTimeoutRef.current) {
+  function clearScrollEndTimeout() {
+    if (scrollEndTimeoutRef.current !== null) {
       window.clearTimeout(scrollEndTimeoutRef.current);
       scrollEndTimeoutRef.current = null;
     }
-  };
+  }
 
-  const getCurrentIndexFromScroll = () => {
+  function getCurrentIndexFromScroll() {
     const slider = sliderRef.current;
-    if (!slider) return 0;
+    if (!slider || totalSlides <= 0) return 0;
 
     const slideWidth = slider.clientWidth;
     if (!slideWidth) return 0;
@@ -83,30 +82,30 @@ export default function HeroMobileCattleya({
       0,
       Math.min(Math.round(slider.scrollLeft / slideWidth), totalSlides - 1)
     );
-  };
+  }
 
-  const goToSlide = (index: number) => {
+  function goToSlide(index: number) {
     const slider = sliderRef.current;
-    if (!slider) return;
+    if (!slider || totalSlides <= 0) return;
 
-    const slideWidth = slider.clientWidth;
+    const safeIndex = Math.max(0, Math.min(index, totalSlides - 1));
 
     slider.scrollTo({
-      left: slideWidth * index,
+      left: slider.clientWidth * safeIndex,
       behavior: "smooth",
     });
-  };
+  }
 
-  const goToNextSlide = () => {
+  function goToNextSlide() {
     if (totalSlides <= 1) return;
 
     const current = getCurrentIndexFromScroll();
     const nextIndex = current + 1 >= totalSlides ? 0 : current + 1;
 
     goToSlide(nextIndex);
-  };
+  }
 
-  const pauseAutoplayTemporarily = () => {
+  function pauseAutoplayTemporarily() {
     autoplayEnabledRef.current = false;
 
     clearAutoplayTimeout();
@@ -115,20 +114,19 @@ export default function HeroMobileCattleya({
     resumeTimeoutRef.current = window.setTimeout(() => {
       autoplayEnabledRef.current = true;
     }, 5000);
-  };
+  }
 
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
 
-    const handleScroll = () => {
+    function handleScroll() {
       clearScrollEndTimeout();
 
       scrollEndTimeoutRef.current = window.setTimeout(() => {
-        const index = getCurrentIndexFromScroll();
-        setActiveIndex(index);
+        setActiveIndex(getCurrentIndexFromScroll());
       }, 90);
-    };
+    }
 
     slider.addEventListener("scroll", handleScroll, { passive: true });
 
@@ -145,7 +143,7 @@ export default function HeroMobileCattleya({
 
     clearAutoplayTimeout();
 
-    const delay = activeMedia?.type === "video" ? 6500 : 4000;
+    const delay = activeMedia?.type === "video" ? 6500 : 4200;
 
     autoplayTimeoutRef.current = window.setTimeout(() => {
       if (!autoplayEnabledRef.current) return;
@@ -166,9 +164,7 @@ export default function HeroMobileCattleya({
   }, []);
 
   return (
-    <section className="relative h-[100svh] overflow-hidden bg-[#0d0d0c] text-white">
-      
-      {/* SLIDER */}
+    <section className="relative h-[100svh] overflow-hidden bg-[#0d0b09] text-white">
       <div
         ref={sliderRef}
         className="relative flex h-full snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -197,8 +193,10 @@ export default function HeroMobileCattleya({
                 />
               )}
 
-              <div className="pointer-events-none absolute inset-0 bg-black/12" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/72" />
+              <div className="absolute inset-0 bg-black/10" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.14),transparent_32%)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/78" />
+              <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#090706] via-[#090706]/72 to-transparent" />
             </div>
           ))
         ) : (
@@ -208,51 +206,88 @@ export default function HeroMobileCattleya({
         )}
       </div>
 
-      {/* CONTENT */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-6 pt-20">
+      <div className="pointer-events-none absolute left-5 right-5 top-7 z-30 flex items-center justify-between">
+        <p className="text-[9px] uppercase tracking-[0.48em] text-white/62">
+          Cattleya
+        </p>
+
+        {totalSlides > 0 && (
+          <p className="text-[9px] uppercase tracking-[0.28em] text-white/58">
+            {padNumber(activeIndex + 1)} / {padNumber(totalSlides)}
+          </p>
+        )}
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-8">
         <motion.div
-          initial={{ opacity: 0, y: 22 }}
+          key={activeIndex}
+          initial={{ opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-[340px]"
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-[355px]"
         >
           {data.eyebrow && (
-            <p className="mb-4 text-[10px] uppercase tracking-[0.34em] text-white/60">
+            <p className="mb-5 text-[10px] uppercase tracking-[0.42em] text-white/58">
               {data.eyebrow}
             </p>
           )}
 
-          <h1 className="text-[42px] leading-[0.95] tracking-tight">
+          <h1 className="max-w-[350px] text-[50px] font-light leading-[0.84] tracking-[-0.095em]">
             {data.title}
           </h1>
 
           {data.description && (
-            <p className="mt-4 text-[14px] text-white/80">
+            <p className="mt-5 max-w-[305px] text-[14px] leading-6 text-white/68">
               {data.description}
             </p>
           )}
 
-          <div className="mt-6 flex gap-4">
+          <div className="mt-7 flex items-center gap-3">
             {data.primary_cta_label && data.primary_cta_href && (
               <Link
                 href={data.primary_cta_href}
-                className="pointer-events-auto flex items-center gap-2 rounded-full bg-white px-5 py-3 text-[11px] uppercase text-black"
+                className="pointer-events-auto flex h-12 items-center gap-3 bg-white px-5 text-[10px] font-medium uppercase tracking-[0.22em] text-black"
               >
                 {data.primary_cta_label}
-                <ArrowRight size={14} />
+                <ArrowRight size={14} weight="bold" />
               </Link>
             )}
 
             {data.secondary_cta_label && data.secondary_cta_href && (
               <Link
                 href={data.secondary_cta_href}
-                className="pointer-events-auto text-[11px] uppercase text-white/70"
+                className="pointer-events-auto flex h-12 items-center px-2 text-[10px] uppercase tracking-[0.22em] text-white/68"
               >
                 {data.secondary_cta_label}
               </Link>
             )}
           </div>
+
+          {data.caption && (
+            <p className="mt-6 max-w-[260px] text-[11px] leading-5 text-white/42">
+              {data.caption}
+            </p>
+          )}
         </motion.div>
+
+        {totalSlides > 1 && (
+          <div className="pointer-events-auto mt-7 flex items-center gap-1.5">
+            {data.media.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  pauseAutoplayTemporarily();
+                  goToSlide(index);
+                }}
+                aria-label={`Aller au visuel ${index + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === activeIndex ? "w-9 bg-white" : "w-1.5 bg-white/32"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

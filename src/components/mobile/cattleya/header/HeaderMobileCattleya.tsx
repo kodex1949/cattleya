@@ -7,6 +7,8 @@ import { CaretDown, Handbag, MagnifyingGlass } from "phosphor-react";
 import MobileMenuButton from "./MobileMenuButton";
 import type { ShopifyMenuItem } from "@/lib/shopify/types";
 
+type HeaderAmbiance = "light" | "dark";
+
 type HeaderMobileCattleyaProps = {
   menuItems?: ShopifyMenuItem[];
 };
@@ -17,14 +19,35 @@ export default function HeaderMobileCattleya({
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
+  const [ambiance, setAmbiance] = useState<HeaderAmbiance>("dark");
 
   const featuredItems = useMemo(() => menuItems.slice(0, 6), [menuItems]);
 
+  const isDarkHeader = !scrolled && ambiance === "dark";
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    function handleAmbiance(event: Event) {
+      const customEvent = event as CustomEvent<HeaderAmbiance>;
+
+      if (customEvent.detail === "light" || customEvent.detail === "dark") {
+        setAmbiance(customEvent.detail);
+      }
+    }
+
+    window.addEventListener("header:ambiance", handleAmbiance);
+
+    return () => {
+      window.removeEventListener("header:ambiance", handleAmbiance);
+    };
   }, []);
 
   useEffect(() => {
@@ -48,38 +71,49 @@ export default function HeaderMobileCattleya({
         <div
           className={`mx-auto flex h-[70px] items-center justify-between transition-all duration-500 ${
             scrolled
-              ? "rounded-[22px] border border-black/[0.06] bg-white/72 px-3 shadow-[0_18px_40px_rgba(0,0,0,0.06)] backdrop-blur-xl"
-              : "border-b border-black/[0.05] bg-white/20 px-4 backdrop-blur-md"
+              ? "rounded-[22px] border border-black/[0.06] bg-white/78 px-3 text-black shadow-[0_18px_40px_rgba(0,0,0,0.06)] backdrop-blur-xl"
+              : isDarkHeader
+                ? "border-b border-white/[0.10] bg-black/5 px-4 text-white backdrop-blur-[2px]"
+                : "border-b border-black/[0.06] bg-white/20 px-4 text-black backdrop-blur-md"
           }`}
         >
           <div className="flex w-[84px] items-center justify-start">
             <MobileMenuButton
               open={menuOpen}
+              dark={isDarkHeader}
               onClick={() => setMenuOpen((prev) => !prev)}
             />
           </div>
 
           <Link
-            href="/"
+            href="/mobile"
             onClick={() => setMenuOpen(false)}
-            className="text-[14px] font-medium uppercase tracking-[0.32em] text-black"
+            className="text-[14px] font-medium uppercase tracking-[0.32em]"
           >
             CATTLEYA
           </Link>
 
           <div className="flex w-[84px] items-center justify-end gap-2">
             <Link
-              href="/search"
+              href="/mobile/search"
               aria-label="Search"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] bg-white/60 text-black backdrop-blur-md"
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-500 ${
+                isDarkHeader
+                  ? "border-white/15 bg-white/8 text-white"
+                  : "border-black/[0.08] bg-white/60 text-black"
+              }`}
             >
               <MagnifyingGlass size={16} weight="thin" />
             </Link>
 
             <Link
-              href="/cart"
+              href="/mobile/cart"
               aria-label="Cart"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] bg-white/60 text-black backdrop-blur-md"
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-500 ${
+                isDarkHeader
+                  ? "border-white/15 bg-white/8 text-white"
+                  : "border-black/[0.08] bg-white/60 text-black"
+              }`}
             >
               <Handbag size={16} weight="thin" />
             </Link>
@@ -224,13 +258,13 @@ export default function HeaderMobileCattleya({
                 </div>
 
                 <div className="mt-6 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-white/52">
-                  <Link href="/account" onClick={() => setMenuOpen(false)}>
+                  <Link href="/mobile/account" onClick={() => setMenuOpen(false)}>
                     Account
                   </Link>
-                  <Link href="/search" onClick={() => setMenuOpen(false)}>
+                  <Link href="/mobile/search" onClick={() => setMenuOpen(false)}>
                     Search
                   </Link>
-                  <Link href="/cart" onClick={() => setMenuOpen(false)}>
+                  <Link href="/mobile/cart" onClick={() => setMenuOpen(false)}>
                     Cart
                   </Link>
                 </div>

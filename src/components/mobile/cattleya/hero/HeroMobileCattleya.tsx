@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "phosphor-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroMediaVideo from "./HeroMediaVideo";
 
 type HeroMediaItem = {
@@ -34,6 +36,8 @@ export default function HeroMobileCattleya({
 }: {
   data: HeroMobileData;
 }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const sliderRef = useRef<HTMLDivElement | null>(null);
 
   const autoplayTimeoutRef = useRef<number | null>(null);
@@ -117,6 +121,31 @@ export default function HeroMobileCattleya({
   }
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const section = sectionRef.current;
+    const content = contentRef.current;
+
+    if (!section || !content) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(content, {
+        y: -72,
+        opacity: 0.78,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
 
@@ -164,7 +193,10 @@ export default function HeroMobileCattleya({
   }, []);
 
   return (
-    <section className="relative h-[100svh] overflow-hidden bg-[#0d0b09] text-white">
+    <section
+      ref={sectionRef}
+      className="relative h-[100svh] overflow-hidden bg-[#0d0b09] text-white"
+    >
       <div
         ref={sliderRef}
         className="relative flex h-full snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -218,7 +250,10 @@ export default function HeroMobileCattleya({
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-8">
+      <div
+        ref={contentRef}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-8"
+      >
         <motion.div
           key={activeIndex}
           initial={{ opacity: 0, y: 26 }}

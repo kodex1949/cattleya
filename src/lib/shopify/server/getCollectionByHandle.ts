@@ -2,6 +2,16 @@ import type { CollectionData } from "@/components/mobile/cattleya/collection/col
 
 const SHOPIFY_ENDPOINT = `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2025-10/graphql.json`;
 
+type ShopifyProductVariantConnection = {
+  nodes: {
+    title: string;
+    selectedOptions: {
+      name: string;
+      value: string;
+    }[];
+  }[];
+};
+
 type ShopifyCollectionResponse = {
   collection: {
     title: string;
@@ -22,15 +32,7 @@ type ShopifyCollectionResponse = {
             currencyCode: string;
           };
         };
-        variants: {
-          nodes: {
-            title: string;
-            selectedOptions: {
-              name: string;
-              value: string;
-            }[];
-          }[];
-        };
+        variants: ShopifyProductVariantConnection;
       }[];
     };
   } | null;
@@ -76,9 +78,7 @@ const COLLECTION_BY_HANDLE_QUERY = `
   }
 `;
 
-function getProductVariantValues(
-  variants: ShopifyCollectionResponse["collection"]["products"]["nodes"][number]["variants"]
-) {
+function getProductVariantValues(variants: ShopifyProductVariantConnection) {
   const values = variants.nodes
     .flatMap((variant) =>
       variant.selectedOptions.map((option) => option.value)

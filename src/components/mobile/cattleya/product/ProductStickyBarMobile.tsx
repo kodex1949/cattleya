@@ -14,14 +14,12 @@ export default function ProductStickyBarMobile({
 }: ProductStickyBarMobileProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const available = Boolean(variant?.availableForSale);
 
   const price = variant
-    ? formatProductPrice(
-        variant.price.amount,
-        variant.price.currencyCode
-      )
+    ? formatProductPrice(variant.price.amount, variant.price.currencyCode)
     : "";
 
   useEffect(() => {
@@ -36,21 +34,45 @@ export default function ProductStickyBarMobile({
   }, []);
 
   async function handleAddToCart() {
-    if (!available || isAdding) return;
+    if (!variant?.id || !available || isAdding) return;
 
     setIsAdding(true);
+    setIsAdded(false);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          merchandiseId: variant.id,
+          quantity: 1,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Cart add failed");
+      }
+
+      setIsAdded(true);
+
+      window.dispatchEvent(new CustomEvent("cart:updated"));
+    } catch {
+      setIsAdded(false);
+    } finally {
       setIsAdding(false);
-    }, 900);
+
+      window.setTimeout(() => {
+        setIsAdded(false);
+      }, 1400);
+    }
   }
 
   return (
     <div
       className={`fixed bottom-6 left-0 z-50 w-full px-5 transition-all duration-500 ${
-        isVisible
-          ? "translate-y-0 opacity-100"
-          : "translate-y-10 opacity-0"
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
       }`}
     >
       <button
@@ -70,13 +92,13 @@ export default function ProductStickyBarMobile({
           {!available
             ? "Indisponible"
             : isAdding
-            ? "Ajout..."
-            : "Commander"}
+              ? "Ajout..."
+              : isAdded
+                ? "Ajouté"
+                : "Commander"}
         </span>
 
-        <span className="text-[13px] tracking-[0.08em]">
-          {price}
-        </span>
+        <span className="text-[13px] tracking-[0.08em]">{price}</span>
       </button>
     </div>
   );

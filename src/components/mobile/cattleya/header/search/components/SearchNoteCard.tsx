@@ -1,4 +1,4 @@
-import type { SearchNote } from "./search-panel.types";
+import type { SearchNote } from "../search-panel.types";
 
 type SearchNoteCardProps = {
   item: SearchNote;

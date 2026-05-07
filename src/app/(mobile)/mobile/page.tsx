@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 import HeroMobileCattleya from "@/components/mobile/cattleya/hero/HeroMobileCattleya";
 import ManifestMobileCattleya from "@/components/mobile/cattleya/manifest/ManifestMobileCattleya";
 import SignatureMobileCattleya from "@/components/mobile/cattleya/home/SignatureMobileCattleya";
@@ -13,24 +17,33 @@ import { getCollectionProducts } from "@/lib/shopify/queries/getCollectionProduc
 type ManifestProduct = ReturnType<typeof mapProductToManifest>;
 
 export default async function MobilePage() {
-  const hero = await getActiveHeroContent();
-  const memberExclusive = await getMemberExclusive();
+  const [hero, memberExclusive, shopifyResult] = await Promise.allSettled([
+    getActiveHeroContent(),
+    getMemberExclusive(),
+    getCollectionProducts("manifest", 6),
+  ]);
 
-  let manifestProducts: ManifestProduct[] = [];
-  let errorMessage: string | null = null;
+  const heroData = hero.status === "fulfilled" ? hero.value : null;
 
-  try {
-    const shopifyProducts = await getCollectionProducts("manifest", 6);
-    manifestProducts = shopifyProducts.map(mapProductToManifest);
-  } catch (error) {
-    errorMessage =
-      error instanceof Error ? error.message : "Erreur Shopify inconnue";
-  }
+  const memberExclusiveData =
+    memberExclusive.status === "fulfilled" ? memberExclusive.value : null;
+
+  const manifestProducts: ManifestProduct[] =
+    shopifyResult.status === "fulfilled"
+      ? shopifyResult.value.map(mapProductToManifest)
+      : [];
+
+  const errorMessage =
+    shopifyResult.status === "rejected"
+      ? shopifyResult.reason instanceof Error
+        ? shopifyResult.reason.message
+        : "Erreur Shopify inconnue"
+      : null;
 
   return (
     <>
-      {hero ? (
-        <HeroMobileCattleya data={hero} />
+      {heroData ? (
+        <HeroMobileCattleya data={heroData} />
       ) : (
         <div className="px-5 py-10 text-sm text-neutral-500">
           Aucun hero actif trouvé dans Supabase.
@@ -48,10 +61,10 @@ export default async function MobilePage() {
       <MobileScrollReveal>
         <SignatureMobileCattleya
           media={
-            memberExclusive
+            memberExclusiveData
               ? {
-                  type: memberExclusive.media_type,
-                  url: memberExclusive.media_url,
+                  type: memberExclusiveData.media_type,
+                  url: memberExclusiveData.media_url,
                   alt: "Exclusivité membres Cattleya",
                 }
               : null

@@ -27,13 +27,13 @@ export default function ManifestMobileCattleya({
     );
   }
 
+  const visibleProducts = products.slice(0, 10);
+
   return (
     <section className="relative overflow-hidden bg-white pb-24 pt-24 text-black">
-      {/* LINES */}
       <div className="absolute inset-x-0 top-0 h-px bg-black/[0.06]" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-black/[0.06]" />
 
-      {/* HEADER */}
       <div className="px-5">
         <div className="mx-auto max-w-[430px]">
           <motion.div
@@ -44,7 +44,6 @@ export default function ManifestMobileCattleya({
             className="mb-10"
           >
             <div className="flex items-end justify-between">
-              {/* TITLE + SUBTITLE */}
               <div>
                 <h2 className="text-[42px] font-light leading-[0.9] tracking-[-0.09em] text-black">
                   Manifest
@@ -55,30 +54,24 @@ export default function ManifestMobileCattleya({
                 </p>
               </div>
 
-              {/* COUNT */}
               <span className="pb-1 text-[10px] uppercase tracking-[0.28em] text-black/30">
-                {String(products.length).padStart(2, "0")}
+                {String(visibleProducts.length).padStart(2, "0")}
               </span>
             </div>
 
-            {/* LINE */}
             <div className="mt-5 h-px w-10 bg-black/12" />
           </motion.div>
         </div>
       </div>
 
-      {/* CARDS */}
       <div
         className="overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <div className="flex items-stretch snap-x snap-mandatory gap-4 px-5">
-          {products.map((product, index) => (
+          {visibleProducts.map((product, index) => (
             <div key={product.id} className="flex h-full snap-center">
-              <ManifestCardMobileCattleya
-                product={product}
-                index={index}
-              />
+              <ManifestCardMobileCattleya product={product} index={index} />
             </div>
           ))}
         </div>

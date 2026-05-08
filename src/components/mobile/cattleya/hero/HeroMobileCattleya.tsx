@@ -38,12 +38,13 @@ export default function HeroMobileCattleya({
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const sliderRef = useRef<HTMLDivElement | null>(null);
 
   const autoplayTimeoutRef = useRef<number | null>(null);
   const resumeTimeoutRef = useRef<number | null>(null);
-  const scrollEndTimeoutRef = useRef<number | null>(null);
   const autoplayEnabledRef = useRef(true);
+
+  const touchStartXRef = useRef<number | null>(null);
+  const touchEndXRef = useRef<number | null>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -68,45 +69,27 @@ export default function HeroMobileCattleya({
     }
   }
 
-  function clearScrollEndTimeout() {
-    if (scrollEndTimeoutRef.current !== null) {
-      window.clearTimeout(scrollEndTimeoutRef.current);
-      scrollEndTimeoutRef.current = null;
-    }
-  }
-
-  function getCurrentIndexFromScroll() {
-    const slider = sliderRef.current;
-    if (!slider || totalSlides <= 0) return 0;
-
-    const slideWidth = slider.clientWidth;
-    if (!slideWidth) return 0;
-
-    return Math.max(
-      0,
-      Math.min(Math.round(slider.scrollLeft / slideWidth), totalSlides - 1)
-    );
-  }
-
   function goToSlide(index: number) {
-    const slider = sliderRef.current;
-    if (!slider || totalSlides <= 0) return;
+    if (totalSlides <= 0) return;
 
     const safeIndex = Math.max(0, Math.min(index, totalSlides - 1));
-
-    slider.scrollTo({
-      left: slider.clientWidth * safeIndex,
-      behavior: "smooth",
-    });
+    setActiveIndex(safeIndex);
   }
 
   function goToNextSlide() {
     if (totalSlides <= 1) return;
 
-    const current = getCurrentIndexFromScroll();
-    const nextIndex = current + 1 >= totalSlides ? 0 : current + 1;
+    setActiveIndex((current) =>
+      current + 1 >= totalSlides ? 0 : current + 1
+    );
+  }
 
-    goToSlide(nextIndex);
+  function goToPreviousSlide() {
+    if (totalSlides <= 1) return;
+
+    setActiveIndex((current) =>
+      current - 1 < 0 ? totalSlides - 1 : current - 1
+    );
   }
 
   function pauseAutoplayTemporarily() {
@@ -118,6 +101,39 @@ export default function HeroMobileCattleya({
     resumeTimeoutRef.current = window.setTimeout(() => {
       autoplayEnabledRef.current = true;
     }, 5000);
+  }
+
+  function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    pauseAutoplayTemporarily();
+
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchEndXRef.current = null;
+  }
+
+  function handleTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    touchEndXRef.current = event.touches[0]?.clientX ?? null;
+  }
+
+  function handleTouchEnd() {
+    const startX = touchStartXRef.current;
+    const endX = touchEndXRef.current;
+
+    touchStartXRef.current = null;
+    touchEndXRef.current = null;
+
+    if (startX === null || endX === null) return;
+
+    const distance = startX - endX;
+    const threshold = 42;
+
+    if (Math.abs(distance) < threshold) return;
+
+    if (distance > 0) {
+      goToNextSlide();
+      return;
+    }
+
+    goToPreviousSlide();
   }
 
   useEffect(() => {
@@ -146,25 +162,6 @@ export default function HeroMobileCattleya({
   }, []);
 
   useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    function handleScroll() {
-      clearScrollEndTimeout();
-
-      scrollEndTimeoutRef.current = window.setTimeout(() => {
-        setActiveIndex(getCurrentIndexFromScroll());
-      }, 90);
-    }
-
-    slider.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      slider.removeEventListener("scroll", handleScroll);
-    };
-  }, [totalSlides]);
-
-  useEffect(() => {
     if (!autoplayEnabledRef.current || totalSlides <= 1) {
       clearAutoplayTimeout();
       return;
@@ -188,7 +185,6 @@ export default function HeroMobileCattleya({
     return () => {
       clearAutoplayTimeout();
       clearResumeTimeout();
-      clearScrollEndTimeout();
     };
   }, []);
 
@@ -198,44 +194,54 @@ export default function HeroMobileCattleya({
       className="relative h-[100svh] overflow-hidden bg-[#0d0b09] text-white"
     >
       <div
-        ref={sliderRef}
-        className="relative flex h-full snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ WebkitOverflowScrolling: "touch" }}
-        onTouchStart={pauseAutoplayTemporarily}
+        className="relative h-full overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onPointerDown={pauseAutoplayTemporarily}
       >
-        {totalSlides > 0 ? (
-          data.media.map((item, index) => (
-            <div
-              key={item.id}
-              className="relative h-full min-w-full shrink-0 snap-start overflow-hidden"
-            >
-              {item.type === "video" ? (
-                <HeroMediaVideo url={item.url} isActive={index === activeIndex} />
-              ) : (
-                <Image
-                  src={item.url}
-                  alt={data.title}
-                  fill
-                  priority={index === 0}
-                  sizes="100vw"
-                  className="pointer-events-none select-none object-cover object-center"
-                  unoptimized
-                  draggable={false}
-                />
-              )}
+        <div
+          className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{
+            transform: `translateX(-${activeIndex * 100}%)`,
+          }}
+        >
+          {totalSlides > 0 ? (
+            data.media.map((item, index) => (
+              <div
+                key={item.id}
+                className="relative h-full min-w-full shrink-0 overflow-hidden"
+              >
+                {item.type === "video" ? (
+                  <HeroMediaVideo
+                    url={item.url}
+                    isActive={index === activeIndex}
+                  />
+                ) : (
+                  <Image
+                    src={item.url}
+                    alt={data.title}
+                    fill
+                    priority={index === 0}
+                    sizes="100vw"
+                    className="pointer-events-none select-none object-cover object-center"
+                    unoptimized
+                    draggable={false}
+                  />
+                )}
 
-              <div className="absolute inset-0 bg-black/10" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.14),transparent_32%)]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/78" />
-              <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#090706] via-[#090706]/72 to-transparent" />
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.14),transparent_32%)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/78" />
+                <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#090706] via-[#090706]/72 to-transparent" />
+              </div>
+            ))
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm text-white/60">
+              Aucun média trouvé
             </div>
-          ))
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-white/60">
-            Aucun média trouvé
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="pointer-events-none absolute left-5 right-5 top-7 z-30 flex items-center justify-between">

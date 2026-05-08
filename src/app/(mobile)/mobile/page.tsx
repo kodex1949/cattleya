@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import HeroMobileCattleya from "@/components/mobile/cattleya/hero/HeroMobileCattleya";
 import ManifestMobileCattleya from "@/components/mobile/cattleya/manifest/ManifestMobileCattleya";
 import SignatureMobileCattleya from "@/components/mobile/cattleya/home/SignatureMobileCattleya";
-import VideoSectionMobileCattleya from "@/components/mobile/cattleya/home/VideoSectionMobileCattleya";
+import CategoriesAccordionMobileCattleya from "@/components/mobile/cattleya/home/CategoriesAccordionMobileCattleya";
 import FeatureProductMobileCattleya from "@/components/mobile/cattleya/home/FeatureProductMobileCattleya";
 import MobileScrollReveal from "@/components/mobile/cattleya/animations/MobileScrollReveal";
 
@@ -73,7 +73,7 @@ export default async function MobilePage() {
       </MobileScrollReveal>
 
       <MobileScrollReveal>
-        <VideoSectionMobileCattleya />
+        <CategoriesAccordionMobileCattleya />
       </MobileScrollReveal>
 
       {manifestProducts[0] && (

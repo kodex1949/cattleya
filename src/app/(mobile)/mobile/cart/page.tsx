@@ -1,8 +1,7 @@
-export const dynamic = "force-dynamic";
-
-export const revalidate = 0;
-
 "use client";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { useState } from "react";
 
@@ -13,10 +12,7 @@ export default function MobileCartPage() {
 
   return (
     <main className="min-h-screen bg-[#101010] text-white">
-      <MobileCartPanel
-        open={open}
-        onClose={() => setOpen(false)}
-      />
+      <MobileCartPanel open={open} onClose={() => setOpen(false)} />
     </main>
   );
 }

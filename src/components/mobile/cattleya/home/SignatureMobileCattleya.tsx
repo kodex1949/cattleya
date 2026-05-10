@@ -33,12 +33,22 @@ export default function SignatureMobileCattleya({
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          duration: 0.9,
+          ease: [0.22, 1, 0.36, 1],
+        }}
         className="mx-auto max-w-[420px]"
       >
-        {/* IMAGE */}
-        <div className="relative overflow-hidden bg-[#eae6df]">
-          <div className="h-[480px] w-full">
+        <p className="text-[10px] uppercase tracking-[0.34em] text-black/35">
+          Exclusivité membres
+        </p>
+
+        <h2 className="mt-4 font-serif text-[46px] font-light leading-[0.9] tracking-[-0.07em]">
+          Accès privé aux créations.
+        </h2>
+
+        <div className="mt-9 overflow-hidden bg-[#e8e2d8]">
+          <div className="h-[520px] w-full">
             {isVideo ? (
               <video
                 src={resolvedMedia.url}
@@ -58,22 +68,12 @@ export default function SignatureMobileCattleya({
           </div>
         </div>
 
-        {/* TEXT BLOCK */}
-        <div className="mt-10">
-          <p className="text-[9px] uppercase tracking-[0.42em] text-black/35">
-            Exclusivité membres
+        <div className="mt-8 border-t border-black/10 pt-6">
+          <p className="text-[14px] leading-7 text-black/55">
+            Une sélection confidentielle réservée aux membres de la maison.
           </p>
 
-          <h2 className="mt-4 text-[40px] font-light leading-[0.9] tracking-[-0.06em]">
-            Accès privé aux créations.
-          </h2>
-
-          <p className="mt-5 text-[14px] leading-7 text-black/55">
-            Une sélection confidentielle, réservée aux membres de la maison.
-          </p>
-
-          {/* CTA */}
-          <div className="mt-8 flex items-center gap-6">
+          <div className="mt-8 flex items-center gap-7">
             <Link
               href="/mobile/account"
               className="text-[11px] uppercase tracking-[0.24em] underline underline-offset-4"
@@ -83,7 +83,7 @@ export default function SignatureMobileCattleya({
 
             <Link
               href="/mobile/sign-in"
-              className="text-[11px] uppercase tracking-[0.24em] text-black/50"
+              className="text-[11px] uppercase tracking-[0.24em] text-black/45"
             >
               Connexion
             </Link>

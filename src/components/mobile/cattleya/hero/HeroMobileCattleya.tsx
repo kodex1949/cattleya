@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "phosphor-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import HeroMediaVideo from "./HeroMediaVideo";
 
 type HeroMediaItem = {
@@ -31,11 +32,7 @@ function padNumber(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export default function HeroMobileCattleya({
-  data,
-}: {
-  data: HeroMobileData;
-}) {
+export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -45,6 +42,8 @@ export default function HeroMobileCattleya({
 
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
+
+  const shouldReduceMotion = useReducedMotion();
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -71,9 +70,7 @@ export default function HeroMobileCattleya({
 
   function goToSlide(index: number) {
     if (totalSlides <= 0) return;
-
-    const safeIndex = Math.max(0, Math.min(index, totalSlides - 1));
-    setActiveIndex(safeIndex);
+    setActiveIndex(Math.max(0, Math.min(index, totalSlides - 1)));
   }
 
   function goToNextSlide() {
@@ -100,7 +97,7 @@ export default function HeroMobileCattleya({
 
     resumeTimeoutRef.current = window.setTimeout(() => {
       autoplayEnabledRef.current = true;
-    }, 5000);
+    }, 5200);
   }
 
   function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
@@ -124,7 +121,7 @@ export default function HeroMobileCattleya({
     if (startX === null || endX === null) return;
 
     const distance = startX - endX;
-    const threshold = 42;
+    const threshold = 34;
 
     if (Math.abs(distance) < threshold) return;
 
@@ -137,6 +134,8 @@ export default function HeroMobileCattleya({
   }
 
   useEffect(() => {
+    if (shouldReduceMotion) return;
+
     gsap.registerPlugin(ScrollTrigger);
 
     const section = sectionRef.current;
@@ -146,8 +145,8 @@ export default function HeroMobileCattleya({
 
     const ctx = gsap.context(() => {
       gsap.to(content, {
-        y: -72,
-        opacity: 0.78,
+        y: -52,
+        opacity: 0.74,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -159,27 +158,29 @@ export default function HeroMobileCattleya({
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
-    if (!autoplayEnabledRef.current || totalSlides <= 1) {
+    if (
+      shouldReduceMotion ||
+      !autoplayEnabledRef.current ||
+      totalSlides <= 1
+    ) {
       clearAutoplayTimeout();
       return;
     }
 
     clearAutoplayTimeout();
 
-    const delay = activeMedia?.type === "video" ? 6500 : 4200;
+    const delay = activeMedia?.type === "video" ? 6800 : 4600;
 
     autoplayTimeoutRef.current = window.setTimeout(() => {
       if (!autoplayEnabledRef.current) return;
       goToNextSlide();
     }, delay);
 
-    return () => {
-      clearAutoplayTimeout();
-    };
-  }, [activeIndex, activeMedia?.type, totalSlides]);
+    return () => clearAutoplayTimeout();
+  }, [activeIndex, activeMedia?.type, totalSlides, shouldReduceMotion]);
 
   useEffect(() => {
     return () => {
@@ -191,19 +192,19 @@ export default function HeroMobileCattleya({
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100svh] overflow-hidden bg-[#0d0b09] text-white"
+      className="relative h-[100svh] overflow-hidden bg-[#090705] text-white"
     >
       <div
-        className="relative h-full overflow-hidden"
+        className="relative h-full overflow-hidden touch-pan-y"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onPointerDown={pauseAutoplayTemporarily}
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="flex h-full transition-transform duration-[850ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{
-            transform: `translateX(-${activeIndex * 100}%)`,
+            transform: `translate3d(-${activeIndex * 100}%,0,0)`,
           }}
         >
           {totalSlides > 0 ? (
@@ -230,106 +231,114 @@ export default function HeroMobileCattleya({
                   />
                 )}
 
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.14),transparent_32%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/78" />
-                <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#090706] via-[#090706]/72 to-transparent" />
+                <div className="absolute inset-0 bg-black/[0.08]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.10),transparent_34%)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/44 via-black/0 to-black/90" />
+                <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-[#060403] via-[#060403]/78 to-transparent" />
               </div>
             ))
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-white/60">
+            <div className="flex h-full w-full items-center justify-center text-sm text-white/50">
               Aucun média trouvé
             </div>
           )}
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-5 right-5 top-7 z-30 flex items-center justify-between">
-        <p className="text-[9px] uppercase tracking-[0.48em] text-white/62">
-          Cattleya
+      <div className="pointer-events-none absolute left-5 right-5 top-[92px] z-30 flex items-center justify-between border-t border-white/14 pt-4">
+        <p className="text-[9px] uppercase tracking-[0.52em] text-white/52">
+          Maison Cattleya
         </p>
 
-        {totalSlides > 0 && (
-          <p className="text-[9px] uppercase tracking-[0.28em] text-white/58">
+        {totalSlides > 0 ? (
+          <p className="text-[9px] uppercase tracking-[0.26em] text-white/42">
             {padNumber(activeIndex + 1)} / {padNumber(totalSlides)}
           </p>
-        )}
+        ) : null}
       </div>
 
       <div
         ref={contentRef}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-8"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-[max(38px,env(safe-area-inset-bottom))]"
       >
         <motion.div
           key={activeIndex}
-          initial={{ opacity: 0, y: 26 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-[355px]"
+          transition={{
+            duration: 0.86,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="max-w-[365px] pb-12"
         >
-          {data.eyebrow && (
-            <p className="mb-5 text-[10px] uppercase tracking-[0.42em] text-white/58">
+          {data.eyebrow ? (
+            <p className="mb-5 text-[9px] uppercase tracking-[0.44em] text-[#d6bc91]/72">
               {data.eyebrow}
             </p>
-          )}
+          ) : null}
 
-          <h1 className="max-w-[350px] text-[50px] font-light leading-[0.84] tracking-[-0.095em]">
+          <h1 className="font-serif text-[60px] font-light leading-[0.78] tracking-[-0.11em]">
             {data.title}
           </h1>
 
-          {data.description && (
-            <p className="mt-5 max-w-[305px] text-[14px] leading-6 text-white/68">
+          {data.description ? (
+            <p className="mt-6 max-w-[305px] text-[14px] font-light leading-7 text-white/62">
               {data.description}
             </p>
-          )}
+          ) : null}
 
-          <div className="mt-7 flex items-center gap-3">
-            {data.primary_cta_label && data.primary_cta_href && (
+          <div className="mt-8 flex items-center gap-6">
+            {data.primary_cta_label && data.primary_cta_href ? (
               <Link
                 href={data.primary_cta_href}
-                className="pointer-events-auto flex h-12 items-center gap-3 bg-white px-5 text-[10px] font-medium uppercase tracking-[0.22em] text-black"
+                className="pointer-events-auto group flex items-center gap-3 border-b border-white/70 pb-2 text-[10px] uppercase tracking-[0.25em] text-white transition active:opacity-70"
               >
                 {data.primary_cta_label}
-                <ArrowRight size={14} weight="bold" />
-              </Link>
-            )}
 
-            {data.secondary_cta_label && data.secondary_cta_href && (
+                <ArrowRight
+                  size={13}
+                  weight="thin"
+                  className="transition-transform duration-300 group-active:translate-x-1"
+                />
+              </Link>
+            ) : null}
+
+            {data.secondary_cta_label && data.secondary_cta_href ? (
               <Link
                 href={data.secondary_cta_href}
-                className="pointer-events-auto flex h-12 items-center px-2 text-[10px] uppercase tracking-[0.22em] text-white/68"
+                className="pointer-events-auto text-[10px] uppercase tracking-[0.25em] text-white/46 transition active:text-white/70"
               >
                 {data.secondary_cta_label}
               </Link>
-            )}
+            ) : null}
           </div>
 
-          {data.caption && (
-            <p className="mt-6 max-w-[260px] text-[11px] leading-5 text-white/42">
+          {data.caption ? (
+            <p className="mt-7 max-w-[260px] border-l border-white/16 pl-4 text-[11px] font-light leading-5 text-white/36">
               {data.caption}
             </p>
-          )}
+          ) : null}
         </motion.div>
-
-        {totalSlides > 1 && (
-          <div className="pointer-events-auto mt-7 flex items-center gap-1.5">
-            {data.media.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  pauseAutoplayTemporarily();
-                  goToSlide(index);
-                }}
-                aria-label={`Aller au visuel ${index + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === activeIndex ? "w-9 bg-white" : "w-1.5 bg-white/32"
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </div>
+
+      {totalSlides > 1 ? (
+        <div className="pointer-events-auto absolute bottom-[max(36px,env(safe-area-inset-bottom))] right-5 z-40 flex items-center gap-2">
+          {data.media.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                pauseAutoplayTemporarily();
+                goToSlide(index);
+              }}
+              aria-label={`Aller au visuel ${index + 1}`}
+              className={`h-px rounded-full transition-all duration-500 ${
+                index === activeIndex ? "w-12 bg-white" : "w-5 bg-white/28"
+              }`}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -29,6 +29,7 @@ export default function HeroMediaVideo({
 
   function revealControls() {
     setControlsVisible(true);
+
     clearControlsTimeout();
 
     controlsTimeoutRef.current = window.setTimeout(() => {
@@ -38,6 +39,7 @@ export default function HeroMediaVideo({
 
   async function togglePlay() {
     const video = videoRef.current;
+
     if (!video) return;
 
     revealControls();
@@ -49,6 +51,7 @@ export default function HeroMediaVideo({
       } catch {
         setIsPlaying(false);
       }
+
       return;
     }
 
@@ -58,12 +61,14 @@ export default function HeroMediaVideo({
 
   function toggleSound() {
     const video = videoRef.current;
+
     if (!video) return;
 
     const nextMuted = !isMuted;
 
     video.muted = nextMuted;
     video.defaultMuted = nextMuted;
+
     setIsMuted(nextMuted);
 
     revealControls();
@@ -71,6 +76,7 @@ export default function HeroMediaVideo({
 
   useEffect(() => {
     const video = videoRef.current;
+
     if (!video) return;
 
     video.muted = isMuted;
@@ -80,6 +86,7 @@ export default function HeroMediaVideo({
 
     async function playVideo() {
       const currentVideo = videoRef.current;
+
       if (!currentVideo) return;
 
       try {
@@ -93,11 +100,14 @@ export default function HeroMediaVideo({
     if (!isActive) {
       video.pause();
       video.currentTime = 0;
+
       setIsPlaying(false);
+
       return;
     }
 
     void playVideo();
+
     revealControls();
 
     const firstRetry = window.setTimeout(() => {
@@ -139,7 +149,7 @@ export default function HeroMediaVideo({
         className="h-full w-full select-none object-cover object-center"
       />
 
-      {isActive && (
+      {isActive ? (
         <motion.div
           initial={false}
           animate={{
@@ -150,12 +160,16 @@ export default function HeroMediaVideo({
             duration: 0.35,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="pointer-events-auto absolute right-5 top-[74px] z-40 flex items-center gap-2"
+          className="pointer-events-auto absolute bottom-9 right-5 z-40 flex items-center gap-2"
         >
           <button
             type="button"
             onClick={togglePlay}
-            aria-label={isPlaying ? "Mettre en pause" : "Lire la vidéo"}
+            aria-label={
+              isPlaying
+                ? "Mettre en pause"
+                : "Lire la vidéo"
+            }
             className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/25 text-white shadow-[0_18px_48px_rgba(0,0,0,0.26)] backdrop-blur-md transition-transform duration-300 active:scale-95"
           >
             {isPlaying ? (
@@ -168,7 +182,11 @@ export default function HeroMediaVideo({
           <button
             type="button"
             onClick={toggleSound}
-            aria-label={isMuted ? "Activer le son" : "Couper le son"}
+            aria-label={
+              isMuted
+                ? "Activer le son"
+                : "Couper le son"
+            }
             className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/25 text-white shadow-[0_18px_48px_rgba(0,0,0,0.26)] backdrop-blur-md transition-transform duration-300 active:scale-95"
           >
             {isMuted ? (
@@ -178,7 +196,7 @@ export default function HeroMediaVideo({
             )}
           </button>
         </motion.div>
-      )}
+      ) : null}
     </div>
   );
 }

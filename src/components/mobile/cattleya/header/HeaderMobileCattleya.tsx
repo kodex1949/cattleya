@@ -103,15 +103,15 @@ export default function HeaderMobileCattleya({
         }`}
       >
         <div
-          className={`mx-auto flex h-[70px] items-center justify-between transition-all duration-500 ${
+          className={`mx-auto flex h-[68px] items-center justify-between transition-all duration-500 ${
             scrolled
-              ? "rounded-[22px] border border-black/[0.06] bg-white/78 px-3 text-black shadow-[0_18px_40px_rgba(0,0,0,0.06)] backdrop-blur-xl"
+              ? "rounded-[22px] border border-black/[0.06] bg-[#f7f3ec]/86 px-3 text-black shadow-[0_18px_45px_rgba(0,0,0,0.08)] backdrop-blur-xl"
               : isDarkHeader
-                ? "border-b border-white/[0.10] bg-black/5 px-4 text-white backdrop-blur-[2px]"
-                : "border-b border-black/[0.06] bg-white/20 px-4 text-black backdrop-blur-md"
+                ? "border-b border-white/[0.10] bg-black/[0.03] px-4 text-white backdrop-blur-[2px]"
+                : "border-b border-black/[0.06] bg-[#f7f3ec]/35 px-4 text-black backdrop-blur-md"
           }`}
         >
-          <div className="flex w-[84px] items-center justify-start">
+          <div className="flex w-[82px] items-center justify-start">
             <MobileMenuButton
               open={menuOpen}
               dark={isDarkHeader}
@@ -130,12 +130,12 @@ export default function HeaderMobileCattleya({
               setSearchOpen(false);
               setCartOpen(false);
             }}
-            className="text-[14px] font-medium uppercase tracking-[0.32em]"
+            className="relative text-[13px] font-medium uppercase tracking-[0.38em]"
           >
             CATTLEYA
           </Link>
 
-          <div className="flex w-[84px] items-center justify-end gap-2">
+          <div className="flex w-[82px] items-center justify-end gap-1.5">
             <button
               type="button"
               aria-label="Ouvrir la recherche"
@@ -144,13 +144,13 @@ export default function HeaderMobileCattleya({
                 setCartOpen(false);
                 setSearchOpen(true);
               }}
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-xl transition-all duration-500 active:scale-95 ${
+              className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-500 active:scale-95 ${
                 isDarkHeader
-                  ? "border-white/15 bg-white/[0.08] text-white"
-                  : "border-black/[0.08] bg-white/60 text-black"
+                  ? "border-white/12 bg-white/[0.06] text-white"
+                  : "border-black/[0.08] bg-white/50 text-black"
               }`}
             >
-              <MagnifyingGlass size={17} weight="thin" />
+              <MagnifyingGlass size={16} weight="thin" />
             </button>
 
             <button
@@ -161,16 +161,16 @@ export default function HeaderMobileCattleya({
                 setSearchOpen(false);
                 setCartOpen(true);
               }}
-              className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-xl transition-all duration-500 active:scale-95 ${
+              className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-500 active:scale-95 ${
                 isDarkHeader
-                  ? "border-white/15 bg-white/[0.08] text-white"
-                  : "border-black/[0.08] bg-white/60 text-black"
+                  ? "border-white/12 bg-white/[0.06] text-white"
+                  : "border-black/[0.08] bg-white/50 text-black"
               }`}
             >
-              <Handbag size={17} weight="thin" />
+              <Handbag size={16} weight="thin" />
 
               {cartCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d6bc91] px-1 text-[9px] font-semibold text-black shadow-[0_4px_12px_rgba(214,188,145,0.45)]">
+                <span className="absolute -right-1 -top-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#d6bc91] px-1 text-[9px] font-semibold text-black shadow-[0_4px_12px_rgba(214,188,145,0.45)]">
                   {cartCount}
                 </span>
               ) : null}

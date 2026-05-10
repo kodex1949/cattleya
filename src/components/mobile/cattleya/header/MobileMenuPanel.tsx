@@ -8,6 +8,7 @@ import {
   User,
   Handbag,
   X,
+  ArrowUpRight,
 } from "phosphor-react";
 
 import type { ShopifyMenuItem } from "@/lib/shopify/types";
@@ -64,7 +65,7 @@ export default function MobileMenuPanel({
 }: MobileMenuPanelProps) {
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <>
           <motion.button
             type="button"
@@ -77,164 +78,170 @@ export default function MobileMenuPanel({
           />
 
           <motion.aside
-            className="fixed inset-x-3 top-[86px] z-50 max-h-[calc(100dvh-104px)] overflow-y-auto rounded-[30px] border border-white/10 bg-[#101010] text-white shadow-[0_30px_90px_rgba(0,0,0,0.55)]"
+            className="fixed inset-x-3 top-[86px] z-50 max-h-[calc(100dvh-104px)] overflow-hidden rounded-[30px] border border-white/10 bg-[#0c0b09] text-white shadow-[0_30px_90px_rgba(0,0,0,0.55)]"
             initial={{ opacity: 0, y: -14, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[30px]">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d6bc91]/70 to-transparent" />
+
               <div className="absolute -right-20 top-0 h-56 w-56 rounded-full bg-[#d6bc91]/10 blur-3xl" />
+
               <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-white/[0.03] blur-3xl" />
             </div>
 
-            <div className="relative px-5 pb-7 pt-5">
-              <div className="flex items-center justify-between">
+            <div className="relative flex max-h-[calc(100dvh-104px)] flex-col overflow-hidden px-5 pb-5 pt-5">
+              <header className="flex items-start justify-between">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-white/38">
-                    Cattleya Menu
+                  <p className="text-[9px] uppercase tracking-[0.42em] text-[#d6bc91]/70">
+                    Maison Cattleya
                   </p>
 
-                  <h2 className="mt-2 text-[30px] font-semibold tracking-[-0.05em]">
+                  <h2 className="mt-2 font-serif text-[36px] font-light leading-[0.9] tracking-[-0.08em]">
                     Menu
                   </h2>
+
+                  <p className="mt-3 max-w-[235px] text-[12px] font-light leading-5 text-white/42">
+                    Collections, signatures et rituels de la maison.
+                  </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={onClose}
-                  className="grid h-10 w-10 place-items-center rounded-full bg-white/10 transition active:scale-95"
+                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.04] transition active:scale-95"
                   aria-label="Fermer le menu"
                 >
-                  <X size={16} weight="bold" />
+                  <X size={16} weight="thin" />
                 </button>
-              </div>
+              </header>
 
-              <nav className="mt-7 flex flex-col">
+              <nav className="mt-6 flex-1 overflow-y-auto pr-1">
                 {menuItems.length > 0 ? (
-                  menuItems.map((item, index) => {
-                    const hasChildren =
-                      Array.isArray(item.items) && item.items.length > 0;
+                  <div className="border-t border-white/10">
+                    {menuItems.map((item, index) => {
+                      const hasChildren =
+                        Array.isArray(item.items) && item.items.length > 0;
 
-                    const isOpen = openItemId === item.id;
+                      const isOpen = openItemId === item.id;
 
-                    return (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.04 }}
-                        className="border-b border-white/10"
-                      >
-                        <div className="flex items-center justify-between py-5">
-                          <Link
-                            href={resolveMobileMenuHref(item.url)}
-                            onClick={() => {
-                              if (!hasChildren) onClose();
-                            }}
-                            className="min-w-0 flex-1 text-[30px] font-semibold leading-none tracking-[-0.06em] text-white"
-                          >
-                            {item.title}
-                          </Link>
-
-                          {hasChildren ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setOpenItemId(isOpen ? null : item.id)
-                              }
-                              className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.07]"
-                              aria-label={`Ouvrir ${item.title}`}
-                            >
-                              <motion.span
-                                animate={{ rotate: isOpen ? 180 : 0 }}
-                                transition={{ duration: 0.24 }}
-                              >
-                                <CaretDown size={15} weight="thin" />
-                              </motion.span>
-                            </button>
-                          ) : (
-                            <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">
+                      return (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.04 }}
+                          className="border-b border-white/10"
+                        >
+                          <div className="flex items-center gap-4 py-5">
+                            <span className="w-7 shrink-0 text-[10px] uppercase tracking-[0.24em] text-[#d6bc91]/48">
                               {String(index + 1).padStart(2, "0")}
                             </span>
-                          )}
-                        </div>
 
-                        <AnimatePresence initial={false}>
-                          {hasChildren && isOpen ? (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{
-                                duration: 0.28,
-                                ease: [0.22, 1, 0.36, 1],
+                            <Link
+                              href={resolveMobileMenuHref(item.url)}
+                              onClick={() => {
+                                if (!hasChildren) onClose();
                               }}
-                              className="overflow-hidden"
+                              className="min-w-0 flex-1 font-serif text-[31px] font-light leading-none tracking-[-0.07em] text-white"
                             >
-                              <div className="pb-5">
-                                {item.items?.map((child, childIndex) => (
-                                  <Link
-                                    key={child.id}
-                                    href={resolveMobileMenuHref(child.url)}
-                                    onClick={onClose}
-                                    className="flex items-center justify-between rounded-[18px] px-3 py-3 text-[13px] uppercase tracking-[0.16em] text-white/58 transition active:bg-white/[0.06]"
-                                  >
-                                    <span>{child.title}</span>
+                              {item.title}
+                            </Link>
 
-                                    <span className="text-[10px] text-white/24">
-                                      {String(childIndex + 1).padStart(2, "0")}
-                                    </span>
-                                  </Link>
-                                ))}
-                              </div>
-                            </motion.div>
-                          ) : null}
-                        </AnimatePresence>
-                      </motion.div>
-                    );
-                  })
+                            {hasChildren ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenItemId(isOpen ? null : item.id)
+                                }
+                                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.035]"
+                                aria-label={`Ouvrir ${item.title}`}
+                              >
+                                <motion.span
+                                  animate={{ rotate: isOpen ? 180 : 0 }}
+                                  transition={{ duration: 0.24 }}
+                                >
+                                  <CaretDown size={15} weight="thin" />
+                                </motion.span>
+                              </button>
+                            ) : (
+                              <ArrowUpRight
+                                size={15}
+                                weight="thin"
+                                className="shrink-0 text-white/28"
+                              />
+                            )}
+                          </div>
+
+                          <AnimatePresence initial={false}>
+                            {hasChildren && isOpen ? (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  duration: 0.28,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pb-5 pl-11">
+                                  {item.items?.map((child, childIndex) => (
+                                    <Link
+                                      key={child.id}
+                                      href={resolveMobileMenuHref(child.url)}
+                                      onClick={onClose}
+                                      className="group flex items-center justify-between border-t border-white/[0.06] py-4 text-[11px] uppercase tracking-[0.22em] text-white/52 transition active:text-white"
+                                    >
+                                      <span>{child.title}</span>
+
+                                      <span className="text-[10px] text-white/22 transition group-active:translate-x-1">
+                                        {String(childIndex + 1).padStart(
+                                          2,
+                                          "0"
+                                        )}
+                                      </span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            ) : null}
+                          </AnimatePresence>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 ) : (
-                  <div className="rounded-[26px] bg-white/[0.07] p-5">
-                    <p className="text-[18px] font-semibold tracking-[-0.04em]">
-                      Aucun menu Shopify trouvé.
+                  <div className="rounded-[26px] border border-white/10 bg-white/[0.035] p-5">
+                    <p className="font-serif text-[26px] font-light tracking-[-0.06em]">
+                      Aucun menu trouvé.
                     </p>
 
-                    <p className="mt-2 text-[13px] leading-5 text-white/50">
+                    <p className="mt-3 text-[12px] leading-5 text-white/44">
                       Connecte ton menu Shopify pour afficher tes collections.
                     </p>
                   </div>
                 )}
               </nav>
 
-              <div className="mt-8 grid grid-cols-1 gap-3">
+              <footer className="mt-5 grid grid-cols-3 gap-2">
                 <Link
                   href="/mobile/account"
                   onClick={onClose}
-                  className="group relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] px-4 transition-all duration-500 active:scale-[0.97]"
+                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.035] px-2 py-4 transition active:scale-[0.96]"
                   aria-label="Compte"
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_70%)] opacity-0 transition-opacity duration-500 group-active:opacity-100" />
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <User
+                      size={18}
+                      weight="thin"
+                      className="text-white/72"
+                    />
 
-                  <div className="relative flex h-14 items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06]">
-                        <User size={16} weight="thin" className="text-white/72" />
-                      </div>
-
-                      <div className="text-left">
-                        <p className="text-[10px] uppercase tracking-[0.24em] text-white/28">
-                          Account
-                        </p>
-
-                        <p className="mt-1 text-[13px] font-light tracking-[-0.02em] text-white/74">
-                          Mon compte
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-white/24 transition-transform duration-500 group-active:translate-x-1">
-                      01
+                    <span className="text-[9px] uppercase tracking-[0.22em] text-white/40">
+                      Compte
                     </span>
                   </div>
                 </Link>
@@ -242,34 +249,18 @@ export default function MobileMenuPanel({
                 <button
                   type="button"
                   onClick={onOpenSearch}
-                  className="group relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] px-4 transition-all duration-500 active:scale-[0.97]"
+                  className="group relative overflow-hidden rounded-[20px] border border-[#d6bc91]/25 bg-[#d6bc91]/[0.08] px-2 py-4 transition active:scale-[0.96]"
                   aria-label="Recherche"
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_70%)] opacity-0 transition-opacity duration-500 group-active:opacity-100" />
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <MagnifyingGlass
+                      size={18}
+                      weight="thin"
+                      className="text-[#d6bc91]"
+                    />
 
-                  <div className="relative flex h-14 items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06]">
-                        <MagnifyingGlass
-                          size={16}
-                          weight="thin"
-                          className="text-white/72"
-                        />
-                      </div>
-
-                      <div className="text-left">
-                        <p className="text-[10px] uppercase tracking-[0.24em] text-white/28">
-                          Search
-                        </p>
-
-                        <p className="mt-1 text-[13px] font-light tracking-[-0.02em] text-white/74">
-                          Rechercher
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-white/24 transition-transform duration-500 group-active:translate-x-1">
-                      02
+                    <span className="text-[9px] uppercase tracking-[0.22em] text-[#d6bc91]/70">
+                      Recherche
                     </span>
                   </div>
                 </button>
@@ -277,42 +268,26 @@ export default function MobileMenuPanel({
                 <Link
                   href="/mobile/cart"
                   onClick={onClose}
-                  className="group relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] px-4 transition-all duration-500 active:scale-[0.97]"
+                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.035] px-2 py-4 transition active:scale-[0.96]"
                   aria-label="Panier"
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_70%)] opacity-0 transition-opacity duration-500 group-active:opacity-100" />
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <Handbag
+                      size={18}
+                      weight="thin"
+                      className="text-white/72"
+                    />
 
-                  <div className="relative flex h-14 items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06]">
-                        <Handbag
-                          size={16}
-                          weight="thin"
-                          className="text-white/72"
-                        />
-                      </div>
-
-                      <div className="text-left">
-                        <p className="text-[10px] uppercase tracking-[0.24em] text-white/28">
-                          Cart
-                        </p>
-
-                        <p className="mt-1 text-[13px] font-light tracking-[-0.02em] text-white/74">
-                          Panier
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-white/24 transition-transform duration-500 group-active:translate-x-1">
-                      03
+                    <span className="text-[9px] uppercase tracking-[0.22em] text-white/40">
+                      Panier
                     </span>
                   </div>
                 </Link>
-              </div>
+              </footer>
             </div>
           </motion.aside>
         </>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 }

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 type HeroMediaRow = {
   id: string;
   is_active: boolean;
-  type: "image" | "video";
+  media_type: "image" | "video";
   media_url: string | null;
   eyebrow: string | null;
   title: string;
@@ -43,12 +43,12 @@ export async function getActiveHero(): Promise<ActiveHero | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("hero_media")
+    .from("hero_content_pc")
     .select(
       `
         id,
         is_active,
-        type,
+        media_type,
         media_url,
         eyebrow,
         title,
@@ -61,7 +61,7 @@ export async function getActiveHero(): Promise<ActiveHero | null> {
       `,
     )
     .eq("is_active", true)
-    .order("created_at", { ascending: false })
+    .order("position", { ascending: true })
     .limit(1)
     .maybeSingle<HeroMediaRow>();
 
@@ -70,9 +70,7 @@ export async function getActiveHero(): Promise<ActiveHero | null> {
     return null;
   }
 
-  if (!data) {
-    return null;
-  }
+  if (!data) return null;
 
   if (!data.media_url || !isValidAbsoluteUrl(data.media_url)) {
     console.error("Invalid hero media_url:", data.media_url);
@@ -80,7 +78,7 @@ export async function getActiveHero(): Promise<ActiveHero | null> {
   }
 
   return {
-    type: data.type,
+    type: data.media_type,
     mediaUrl: data.media_url,
     eyebrow: data.eyebrow,
     title: data.title,

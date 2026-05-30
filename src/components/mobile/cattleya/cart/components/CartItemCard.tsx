@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 
-import type { CartLine } from "../cart-panel.types";
-
+import type { CartApiResponse, CartLine } from "../cart-panel.types";
 import { formatCartPrice } from "../cart-panel.utils";
-
 import CartQuantitySelector from "./CartQuantitySelector";
 
 type CartItemCardProps = {
@@ -13,45 +11,41 @@ type CartItemCardProps = {
   onRefresh: () => Promise<void>;
 };
 
-export default function CartItemCard({
-  line,
-  onRefresh,
-}: CartItemCardProps) {
+export default function CartItemCard({ line, onRefresh }: CartItemCardProps) {
   const [loading, setLoading] = useState(false);
 
   const product = line.merchandise.product;
+  const image = line.merchandise.image ?? product.featuredImage;
 
-  const image =
-    line.merchandise.image ??
-    product.featuredImage;
+  async function updateQuantity(quantity: number) {
+    if (loading) return;
 
-  async function updateQuantity(
-    quantity: number
-  ) {
     setLoading(true);
 
     try {
-      await fetch("/api/cart", {
+      const response = await fetch("/api/cart", {
         method: "PATCH",
-
         headers: {
-          "Content-Type":
-            "application/json",
+          "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           lineId: line.id,
           quantity,
         }),
       });
 
-      window.dispatchEvent(
-        new CustomEvent(
-          "cart:updated"
-        )
-      );
+      const data = (await response.json()) as CartApiResponse;
+
+      if (!response.ok) {
+        console.error("Cart PATCH error:", data);
+        return;
+      }
+
+      console.log("Cart updated:", data.cart);
 
       await onRefresh();
+    } catch (error) {
+      console.error("Cart update failed:", error);
     } finally {
       setLoading(false);
     }
@@ -63,10 +57,7 @@ export default function CartItemCard({
         {image?.url ? (
           <img
             src={image.url}
-            alt={
-              image.altText ??
-              product.title
-            }
+            alt={image.altText ?? product.title}
             className="h-full w-full object-cover"
           />
         ) : null}
@@ -75,8 +66,7 @@ export default function CartItemCard({
       <div className="flex h-full min-w-0 flex-col justify-between py-1">
         <div>
           <p className="truncate text-[10px] uppercase tracking-[0.2em] text-white/35">
-            {product.vendor ||
-              "Cattleya"}
+            {product.vendor || "Cattleya"}
           </p>
 
           <p className="mt-1 line-clamp-2 text-[16px] font-semibold tracking-[-0.04em] text-white">
@@ -85,28 +75,15 @@ export default function CartItemCard({
         </div>
 
         <p className="text-[14px] font-medium text-white/60">
-          {formatCartPrice(
-            line.cost.totalAmount
-          )}
+          {formatCartPrice(line.cost.totalAmount)}
         </p>
       </div>
 
       <CartQuantitySelector
         quantity={line.quantity}
         loading={loading}
-        onDecrease={() =>
-          updateQuantity(
-            Math.max(
-              0,
-              line.quantity - 1
-            )
-          )
-        }
-        onIncrease={() =>
-          updateQuantity(
-            line.quantity + 1
-          )
-        }
+        onDecrease={() => updateQuantity(Math.max(0, line.quantity - 1))}
+        onIncrease={() => updateQuantity(line.quantity + 1)}
       />
     </div>
   );

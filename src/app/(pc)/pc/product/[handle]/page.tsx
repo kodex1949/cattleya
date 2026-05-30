@@ -1,13 +1,25 @@
-import { getProductByHandle } from "@/lib/shopify/products";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ handle: string }>;
-}) {
+import { notFound } from "next/navigation";
+import ProductPCCattleya from "@/components/pc/cattleya/product/ProductPCCattleya";
+import { getProductByHandle } from "@/lib/shopify/product/get-product-by-handle";
+
+type ProductPageProps = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+
+export default async function ProductPage({ params }: ProductPageProps) {
   const { handle } = await params;
 
-  const p = await getProductByHandle(handle);
+  const product = await getProductByHandle(handle);
 
-  return <div>PC: {p?.title}</div>;
+  if (!product) {
+    notFound();
+  }
+
+  return <ProductPCCattleya product={product} />;
 }

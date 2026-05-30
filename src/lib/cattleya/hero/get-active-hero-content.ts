@@ -1,14 +1,14 @@
 import "server-only";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 
-type HeroMediaItem = {
+import type {
+  ActiveHeroPCContent,
+  HeroPCMediaItem,
+} from "@/components/pc/hero/hero.types";
+
+type HeroPCRow = {
   id: string;
-  type: "image" | "video";
-  url: string;
-};
-
-type HeroContentRow = {
   eyebrow: string | null;
   title: string;
   description: string | null;
@@ -17,89 +17,67 @@ type HeroContentRow = {
   primary_cta_href: string | null;
   secondary_cta_label: string | null;
   secondary_cta_href: string | null;
-  media: unknown;
+  media_type: "image" | "video";
+  media_url: string;
+  position: number;
 };
 
-export type ActiveHeroContent = {
-  eyebrow: string | null;
-  title: string;
-  description: string | null;
-  caption: string | null;
-  primary_cta_label: string | null;
-  primary_cta_href: string | null;
-  secondary_cta_label: string | null;
-  secondary_cta_href: string | null;
-  media: HeroMediaItem[];
-};
+export async function getActiveHeroPCContent(): Promise<ActiveHeroPCContent | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-function isValidAbsoluteUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error("Missing Supabase env vars");
+    return null;
   }
-}
 
-function parseMedia(value: unknown): HeroMediaItem[] {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .filter((item): item is { id?: unknown; type?: unknown; url?: unknown } => {
-      return typeof item === "object" && item !== null;
-    })
-    .map((item, index): HeroMediaItem => {
-      const mediaType: "image" | "video" =
-        item.type === "video" ? "video" : "image";
-
-      return {
-        id: typeof item.id === "string" ? item.id : String(index + 1),
-        type: mediaType,
-        url: typeof item.url === "string" ? item.url : "",
-      };
-    })
-    .filter((item) => item.url.length > 0 && isValidAbsoluteUrl(item.url));
-}
-
-export async function getActiveHeroContent(): Promise<ActiveHeroContent | null> {
-  const supabase = await createClient();
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   const { data, error } = await supabase
-    .from("hero_content")
-    .select(`
-      eyebrow,
-      title,
-      description,
-      caption,
-      primary_cta_label,
-      primary_cta_href,
-      secondary_cta_label,
-      secondary_cta_href,
-      media
-    `)
+    .from("hero_content_pc")
+    .select(
+      "id, eyebrow, title, description, caption, primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href, media_type, media_url, position",
+    )
     .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle<HeroContentRow>();
+    .order("position", { ascending: true });
 
   if (error) {
-    console.error("Failed to fetch active hero content:", error.message);
+    console.error("Hero PC Supabase error:", error.message);
     return null;
   }
 
-  if (!data) {
-    return null;
-  }
+  if (!data || data.length === 0) return null;
+
+  const rows = data as HeroPCRow[];
+  const firstItem = rows[0];
+
+  const media: HeroPCMediaItem[] = rows.map((item) => ({
+    id: item.id,
+    type: item.media_type === "video" ? "video" : "image",
+    url: item.media_url,
+
+    eyebrow: item.eyebrow,
+    title: item.title,
+    description: item.description,
+    caption: item.caption,
+
+    primary_cta_label: item.primary_cta_label,
+    primary_cta_href: item.primary_cta_href,
+    secondary_cta_label: item.secondary_cta_label,
+    secondary_cta_href: item.secondary_cta_href,
+  }));
+
+  console.log("HERO PC MEDIA WITH TEXT:", media);
 
   return {
-    eyebrow: data.eyebrow,
-    title: data.title,
-    description: data.description,
-    caption: data.caption,
-    primary_cta_label: data.primary_cta_label,
-    primary_cta_href: data.primary_cta_href,
-    secondary_cta_label: data.secondary_cta_label,
-    secondary_cta_href: data.secondary_cta_href,
-    media: parseMedia(data.media),
+    eyebrow: firstItem.eyebrow,
+    title: firstItem.title,
+    description: firstItem.description,
+    caption: firstItem.caption,
+    primary_cta_label: firstItem.primary_cta_label,
+    primary_cta_href: firstItem.primary_cta_href,
+    secondary_cta_label: firstItem.secondary_cta_label,
+    secondary_cta_href: firstItem.secondary_cta_href,
+    media,
   };
 }

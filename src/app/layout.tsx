@@ -1,6 +1,8 @@
 import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
 
+import CattleyaToaster from "@/components/common/CattleyaToaster";
+
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
@@ -9,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "ZAHRA",
+  title: "CATTLEYA",
   description: "Luxury perfumes & essentials",
 };
 
@@ -22,6 +24,8 @@ export default function RootLayout({
     <html lang="fr" className={spaceGrotesk.variable}>
       <body className="min-h-screen bg-white text-black antialiased font-sans">
         {children}
+
+        <CattleyaToaster />
       </body>
     </html>
   );

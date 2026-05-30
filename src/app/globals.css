@@ -67,3 +67,42 @@ body {
     @apply font-sans text-[11px] uppercase tracking-[0.18em];
   }
 }
+
+.cattleya-high-contrast body {
+  background: #000000;
+  color: #ffffff;
+}
+
+.cattleya-high-contrast main {
+  background: #000000 !important;
+}
+
+.cattleya-high-contrast footer {
+  background: #000000 !important;
+}
+
+.cattleya-high-contrast footer > div:last-child {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.cattleya-high-contrast footer a,
+.cattleya-high-contrast footer p,
+.cattleya-high-contrast footer span,
+.cattleya-high-contrast footer h3 {
+  color: inherit;
+}
+
+.cattleya-high-contrast footer input {
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.cattleya-high-contrast footer input::placeholder {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.cattleya-high-contrast footer button[type="submit"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+}

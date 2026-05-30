@@ -6,9 +6,12 @@ export default function LayoutPC({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-white text-black">
+    <div className="relative min-h-screen bg-[#080604] text-white">
       <HeaderPC />
-      <div className="pt-20">{children}</div>
+
+      <div className="relative">
+        {children}
+      </div>
     </div>
   );
 }

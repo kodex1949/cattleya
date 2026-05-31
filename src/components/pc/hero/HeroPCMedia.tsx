@@ -64,11 +64,14 @@ export default function HeroPCMedia({
               <video
                 ref={(element) => {
                   videoRefs.current[media.id] = element;
+
+                  if (element) {
+                    element.muted = true;
+                  }
                 }}
                 data-hero-video={media.id}
                 src={media.url}
                 muted
-                defaultMuted
                 playsInline
                 preload="auto"
                 autoPlay={isActive}

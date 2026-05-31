@@ -10,7 +10,7 @@ import FeatureProductMobileCattleya from "@/components/mobile/cattleya/home/Feat
 import FooterMobileCattleya from "@/components/mobile/cattleya/footer/FooterMobileCattleya";
 import MobileScrollReveal from "@/components/mobile/cattleya/animations/MobileScrollReveal";
 
-import { getActiveHeroContent } from "@/lib/cattleya/hero/get-active-hero-content";
+import { getActiveHeroPCContent } from "@/lib/cattleya/hero/get-active-hero-content";
 import { getMemberExclusive } from "@/lib/cattleya/member/get-member-exclusive";
 import { getHomeCategories } from "@/lib/cattleya/categories/get-home-categories";
 
@@ -26,14 +26,13 @@ export default async function MobilePage() {
     shopifyResult,
     homeCategoriesResult,
   ] = await Promise.allSettled([
-    getActiveHeroContent(),
+    getActiveHeroPCContent(),
     getMemberExclusive(),
     getCollectionProducts("manifest", 8),
     getHomeCategories(),
   ]);
 
-  const heroData =
-    hero.status === "fulfilled" ? hero.value : null;
+  const heroData = hero.status === "fulfilled" ? hero.value : null;
 
   const memberExclusiveData =
     memberExclusive.status === "fulfilled"
@@ -73,9 +72,7 @@ export default async function MobilePage() {
             {errorMessage}
           </div>
         ) : (
-          <ManifestMobileCattleya
-            products={manifestProducts}
-          />
+          <ManifestMobileCattleya products={manifestProducts} />
         )}
       </MobileScrollReveal>
 
@@ -94,16 +91,12 @@ export default async function MobilePage() {
       </MobileScrollReveal>
 
       <MobileScrollReveal>
-        <CategoriesAccordionMobileCattleya
-          categories={categories}
-        />
+        <CategoriesAccordionMobileCattleya categories={categories} />
       </MobileScrollReveal>
 
       {manifestProducts[0] && (
         <MobileScrollReveal>
-          <FeatureProductMobileCattleya
-            product={manifestProducts[0]}
-          />
+          <FeatureProductMobileCattleya product={manifestProducts[0]} />
         </MobileScrollReveal>
       )}
 

@@ -62,17 +62,20 @@ export default function HeroPC({ data }: HeroPCProps) {
 
   const goToPreviousSlide = useCallback(() => {
     if (!slides.length) return;
+
     setActiveIndex((current) => (current - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
   const goToNextSlide = useCallback(() => {
     if (!slides.length) return;
+
     setActiveIndex((current) => (current + 1) % slides.length);
   }, [slides.length]);
 
   const goToSlide = useCallback(
     (index: number) => {
       if (!slides.length) return;
+
       setActiveIndex((index + slides.length) % slides.length);
     },
     [slides.length],
@@ -82,9 +85,11 @@ export default function HeroPC({ data }: HeroPCProps) {
     setIsVideoPlaying(activeSlide?.type === "video");
     setIsVideoMuted(true);
 
-    window.setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       syncVideoState();
     }, 80);
+
+    return () => window.clearTimeout(timeout);
   }, [activeSlide, syncVideoState]);
 
   useEffect(() => {
@@ -102,6 +107,8 @@ export default function HeroPC({ data }: HeroPCProps) {
 
     if (!video) return;
 
+    const currentVideo = video;
+
     function handleEnded() {
       goToNextSlide();
     }
@@ -115,19 +122,19 @@ export default function HeroPC({ data }: HeroPCProps) {
     }
 
     function handleVolumeChange() {
-      setIsVideoMuted(video.muted);
+      setIsVideoMuted(currentVideo.muted);
     }
 
-    video.addEventListener("ended", handleEnded);
-    video.addEventListener("play", handlePlay);
-    video.addEventListener("pause", handlePause);
-    video.addEventListener("volumechange", handleVolumeChange);
+    currentVideo.addEventListener("ended", handleEnded);
+    currentVideo.addEventListener("play", handlePlay);
+    currentVideo.addEventListener("pause", handlePause);
+    currentVideo.addEventListener("volumechange", handleVolumeChange);
 
     return () => {
-      video.removeEventListener("ended", handleEnded);
-      video.removeEventListener("play", handlePlay);
-      video.removeEventListener("pause", handlePause);
-      video.removeEventListener("volumechange", handleVolumeChange);
+      currentVideo.removeEventListener("ended", handleEnded);
+      currentVideo.removeEventListener("play", handlePlay);
+      currentVideo.removeEventListener("pause", handlePause);
+      currentVideo.removeEventListener("volumechange", handleVolumeChange);
     };
   }, [activeSlide, getActiveVideo, goToNextSlide, slides.length]);
 

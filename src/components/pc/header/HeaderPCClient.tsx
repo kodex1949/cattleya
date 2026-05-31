@@ -12,6 +12,7 @@ import HeaderPCActions from "./HeaderPCActions";
 import HeaderPCLogo from "./HeaderPCLogo";
 import SearchPCOverlay from "@/components/pc/search/SearchPCOverlay";
 import CartPCPanel from "@/components/pc/cattleya/cart/CartPCPanel";
+import AccountPCPanel from "@/components/pc/cattleya/account/AccountPCPanel";
 
 type HeaderPCClientProps = {
   menuItems: ShopifyMenuItem[];
@@ -23,6 +24,7 @@ export default function HeaderPCClient({ menuItems }: HeaderPCClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const [activeItem, setActiveItem] = useState<ShopifyMenuItem | null>(
@@ -87,7 +89,7 @@ export default function HeaderPCClient({ menuItems }: HeaderPCClientProps) {
             forceColor={forceColor}
             onSearchOpen={() => setSearchOpen(true)}
             onCartOpen={() => setCartOpen(true)}
-            onAccountOpen={() => {}}
+            onAccountOpen={() => setAccountOpen(true)}
           />
         </div>
       </header>
@@ -264,6 +266,11 @@ export default function HeaderPCClient({ menuItems }: HeaderPCClientProps) {
       <SearchPCOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       <CartPCPanel open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      <AccountPCPanel
+        open={accountOpen}
+        onClose={() => setAccountOpen(false)}
+      />
     </>
   );
 }

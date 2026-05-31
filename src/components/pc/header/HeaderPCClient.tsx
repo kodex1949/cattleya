@@ -87,6 +87,7 @@ export default function HeaderPCClient({ menuItems }: HeaderPCClientProps) {
             forceColor={forceColor}
             onSearchOpen={() => setSearchOpen(true)}
             onCartOpen={() => setCartOpen(true)}
+            onAccountOpen={() => {}}
           />
         </div>
       </header>

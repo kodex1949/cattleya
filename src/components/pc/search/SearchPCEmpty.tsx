@@ -29,7 +29,6 @@ export default function SearchPCEmpty({
               key={mediaUrl}
               src={mediaUrl}
               muted
-              defaultMuted
               autoPlay
               loop
               playsInline
@@ -52,13 +51,11 @@ export default function SearchPCEmpty({
 
       <div className="relative z-10 flex h-full flex-col justify-end p-14 text-white">
         <p className="text-[10px] uppercase tracking-[0.44em] text-white/40">
-          {eyebrow ??
-            "Maison Cattleya"}
+          {eyebrow ?? "Maison Cattleya"}
         </p>
 
         <h2 className="mt-7 max-w-[320px] font-serif text-[82px] font-light leading-[0.84] tracking-[-0.08em] text-white">
-          {title ??
-            "Trouver le sillage"}
+          {title ?? "Trouver le sillage"}
         </h2>
 
         <p className="mt-10 max-w-[320px] text-[13px] leading-7 text-white/60">

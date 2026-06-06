@@ -24,7 +24,6 @@ export default function MaterialsCattleyaPC({
 
   useEffect(() => {
     const section = sectionRef.current;
-
     if (!section) return;
 
     const ctx = gsap.context(() => {
@@ -106,14 +105,11 @@ export default function MaterialsCattleyaPC({
           </h2>
         </div>
 
-        <div
-          ref={cardsRef}
-          className="grid grid-cols-4 gap-4"
-        >
+        <div ref={cardsRef} className="grid grid-cols-4 gap-4">
           {materials.map((item) => (
             <Link
               key={item.id}
-              href={item.href}
+              href={`/pc/matieres/${item.handle}`}
               className="group relative h-[640px] overflow-hidden bg-black"
             >
               {item.media_type === "video" ? (

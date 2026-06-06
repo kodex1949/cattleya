@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
 
-import CattleyaToaster from "@/components/common/CattleyaToaster";
+import CattleyaToaster from "@/components/pc/cattleya/cart/CattleyaToaster";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],

@@ -1,29 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-export type CattleyaMaterial = {
-  id: string;
-  handle: string;
-  label: string;
-  title: string;
-  description: string;
-  media_type: "image" | "video";
-  media_url: string;
-  hero_title: string | null;
-  hero_description: string | null;
-  hero_media_url: string | null;
-};
+import type { CattleyaMaterial } from "./get-cattleya-materials";
 
-export async function getCattleyaMaterials(): Promise<CattleyaMaterial[]> {
+export async function getCattleyaMaterialByHandle(
+  handle: string,
+): Promise<CattleyaMaterial | null> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return [];
+    return null;
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("cattleya_materials")
     .select(`
       id,
@@ -37,8 +28,13 @@ export async function getCattleyaMaterials(): Promise<CattleyaMaterial[]> {
       hero_description,
       hero_media_url
     `)
+    .eq("handle", handle)
     .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+    .single();
 
-  return (data ?? []) as CattleyaMaterial[];
+  if (error || !data) {
+    return null;
+  }
+
+  return data as CattleyaMaterial;
 }

@@ -44,7 +44,6 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
   const touchEndXRef = useRef<number | null>(null);
 
   const shouldReduceMotion = useReducedMotion();
-
   const [activeIndex, setActiveIndex] = useState(0);
 
   const totalSlides = data.media.length;
@@ -75,7 +74,6 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
 
   function goToNextSlide() {
     if (totalSlides <= 1) return;
-
     setActiveIndex((current) =>
       current + 1 >= totalSlides ? 0 : current + 1
     );
@@ -83,7 +81,6 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
 
   function goToPreviousSlide() {
     if (totalSlides <= 1) return;
-
     setActiveIndex((current) =>
       current - 1 < 0 ? totalSlides - 1 : current - 1
     );
@@ -102,7 +99,6 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
 
   function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
     pauseAutoplayTemporarily();
-
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
     touchEndXRef.current = null;
   }
@@ -145,8 +141,9 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
 
     const ctx = gsap.context(() => {
       gsap.to(content, {
-        y: -52,
-        opacity: 0.74,
+        y: -46,
+        opacity: 0.78,
+        scale: 0.985,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -172,7 +169,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
 
     clearAutoplayTimeout();
 
-    const delay = activeMedia?.type === "video" ? 6800 : 4600;
+    const delay = activeMedia?.type === "video" ? 6800 : 4800;
 
     autoplayTimeoutRef.current = window.setTimeout(() => {
       if (!autoplayEnabledRef.current) return;
@@ -192,7 +189,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100svh] overflow-hidden bg-[#090705] text-white"
+      className="relative h-[100svh] overflow-hidden bg-[#070504] text-white"
     >
       <div
         className="relative h-full overflow-hidden touch-pan-y"
@@ -202,7 +199,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
         onPointerDown={pauseAutoplayTemporarily}
       >
         <div
-          className="flex h-full transition-transform duration-[850ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="flex h-full transition-transform duration-[950ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{
             transform: `translate3d(-${activeIndex * 100}%,0,0)`,
           }}
@@ -225,16 +222,17 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
                     fill
                     priority={index === 0}
                     sizes="100vw"
-                    className="pointer-events-none select-none object-cover object-center"
+                    className="pointer-events-none select-none object-cover object-center scale-[1.03]"
                     unoptimized
                     draggable={false}
                   />
                 )}
 
-                <div className="absolute inset-0 bg-black/[0.08]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.10),transparent_34%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/44 via-black/0 to-black/90" />
-                <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-[#060403] via-[#060403]/78 to-transparent" />
+                <div className="absolute inset-0 bg-black/[0.10]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(214,188,145,0.18),transparent_32%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.52)_0%,rgba(0,0,0,0.04)_34%,rgba(0,0,0,0.82)_100%)]" />
+                <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-[#050302] via-[#050302]/82 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-[24%] bg-gradient-to-b from-black/46 to-transparent" />
               </div>
             ))
           ) : (
@@ -245,53 +243,59 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-5 right-5 top-[92px] z-30 flex items-center justify-between border-t border-white/14 pt-4">
-        <p className="text-[9px] uppercase tracking-[0.52em] text-white/52">
-          Maison Cattleya
-        </p>
-
-        {totalSlides > 0 ? (
-          <p className="text-[9px] uppercase tracking-[0.26em] text-white/42">
-            {padNumber(activeIndex + 1)} / {padNumber(totalSlides)}
+      <div className="pointer-events-none absolute left-5 right-5 top-[86px] z-30">
+        <div className="flex items-center justify-between border-t border-white/12 pt-4">
+          <p className="text-[8px] uppercase tracking-[0.48em] text-white/48">
+            Maison Cattleya
           </p>
-        ) : null}
+
+          {totalSlides > 0 ? (
+            <p className="text-[8px] uppercase tracking-[0.28em] text-white/42">
+              {padNumber(activeIndex + 1)} / {padNumber(totalSlides)}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <div
         ref={contentRef}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-5 pb-[max(38px,env(safe-area-inset-bottom))]"
+        className="pointer-events-none absolute inset-x-0 bottom-[74px] z-30 flex justify-center px-6"
       >
         <motion.div
           key={activeIndex}
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={
+            shouldReduceMotion
+              ? false
+              : { opacity: 0, y: 28, scale: 0.985 }
+          }
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{
-            duration: 0.86,
+            duration: 0.92,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="max-w-[365px] pb-12"
+          className="mx-auto max-w-[348px] text-center"
         >
           {data.eyebrow ? (
-            <p className="mb-5 text-[9px] uppercase tracking-[0.44em] text-[#d6bc91]/72">
+            <p className="mb-5 text-[9px] uppercase tracking-[0.52em] text-[#d6bc91]/82">
               {data.eyebrow}
             </p>
           ) : null}
 
-          <h1 className="font-serif text-[60px] font-light leading-[0.78] tracking-[-0.11em]">
+          <h1 className="font-serif text-[62px] font-light leading-[0.82] tracking-[-0.105em] text-white drop-shadow-[0_18px_46px_rgba(0,0,0,0.52)]">
             {data.title}
           </h1>
 
           {data.description ? (
-            <p className="mt-6 max-w-[305px] text-[14px] font-light leading-7 text-white/62">
+            <p className="mx-auto mt-6 max-w-[300px] text-[13px] font-light leading-[1.9] text-white/66">
               {data.description}
             </p>
           ) : null}
 
-          <div className="mt-8 flex items-center gap-6">
+          <div className="mt-8 flex flex-col items-center justify-center gap-4">
             {data.primary_cta_label && data.primary_cta_href ? (
               <Link
                 href={data.primary_cta_href}
-                className="pointer-events-auto group flex items-center gap-3 border-b border-white/70 pb-2 text-[10px] uppercase tracking-[0.25em] text-white transition active:opacity-70"
+                className="pointer-events-auto group flex h-11 min-w-[218px] items-center justify-center gap-3 border border-white/80 bg-white px-6 text-[10px] uppercase tracking-[0.28em] text-black shadow-[0_20px_70px_rgba(0,0,0,0.36)] transition active:scale-[0.98]"
               >
                 {data.primary_cta_label}
 
@@ -306,7 +310,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
             {data.secondary_cta_label && data.secondary_cta_href ? (
               <Link
                 href={data.secondary_cta_href}
-                className="pointer-events-auto text-[10px] uppercase tracking-[0.25em] text-white/46 transition active:text-white/70"
+                className="pointer-events-auto border-b border-white/22 pb-2 text-[10px] uppercase tracking-[0.28em] text-white/58 transition active:text-white"
               >
                 {data.secondary_cta_label}
               </Link>
@@ -314,7 +318,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
           </div>
 
           {data.caption ? (
-            <p className="mt-7 max-w-[260px] border-l border-white/16 pl-4 text-[11px] font-light leading-5 text-white/36">
+            <p className="mx-auto mt-7 max-w-[260px] border-t border-white/14 pt-4 text-[10px] font-light uppercase leading-5 tracking-[0.18em] text-white/34">
               {data.caption}
             </p>
           ) : null}
@@ -322,7 +326,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
       </div>
 
       {totalSlides > 1 ? (
-        <div className="pointer-events-auto absolute bottom-[max(36px,env(safe-area-inset-bottom))] right-5 z-40 flex items-center gap-2">
+        <div className="pointer-events-auto absolute bottom-[max(34px,env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-2">
           {data.media.map((item, index) => (
             <button
               key={item.id}
@@ -333,7 +337,7 @@ export default function HeroMobileCattleya({ data }: { data: HeroMobileData }) {
               }}
               aria-label={`Aller au visuel ${index + 1}`}
               className={`h-px rounded-full transition-all duration-500 ${
-                index === activeIndex ? "w-12 bg-white" : "w-5 bg-white/28"
+                index === activeIndex ? "w-11 bg-white" : "w-4 bg-white/26"
               }`}
             />
           ))}

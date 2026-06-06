@@ -1,22 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
-    pathname === "/" ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.startsWith("/mobile") ||
-    pathname.startsWith("/pc") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
+  }
+
+  if (pathname === "/") {
+    const { device } = userAgent(request);
+
+    const url = request.nextUrl.clone();
+
+    url.pathname =
+      device.type === "mobile" || device.type === "tablet"
+        ? "/mobile"
+        : "/pc";
+
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico).*)"],
+  matcher: ["/"],
 };

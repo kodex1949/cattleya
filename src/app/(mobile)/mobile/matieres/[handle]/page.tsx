@@ -31,7 +31,7 @@ export default async function MaterialPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-[#080604] text-white">
-      <MaterialCollectionHeroMobile material={material} />
+      <MaterialCollectionHeroMobile handle={material.handle} />
 
       <MaterialProductsMobile handle={material.handle} />
 

@@ -11,17 +11,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const { device } = userAgent(request);
+
+  const isMobile =
+    device.type === "mobile" ||
+    device.type === "tablet";
+
   if (pathname === "/") {
-    const { device } = userAgent(request);
-
-    const url = request.nextUrl.clone();
-
-    url.pathname =
-      device.type === "mobile" || device.type === "tablet"
-        ? "/mobile"
-        : "/pc";
-
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(
+      new URL(isMobile ? "/mobile" : "/pc", request.url)
+    );
   }
 
   return NextResponse.next();

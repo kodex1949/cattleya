@@ -9,7 +9,6 @@ import MaterialProductsMobile from "@/components/mobile/cattleya/materials/Mater
 import RelatedMaterialsMobile from "@/components/mobile/cattleya/materials/RelatedMaterialsMobile";
 
 import { getCattleyaMaterialByHandle } from "@/lib/cattleya/materials/get-cattleya-material-by-handle";
-import { getCattleyaMaterials } from "@/lib/cattleya/materials/get-cattleya-materials";
 
 type PageProps = {
   params: Promise<{
@@ -20,10 +19,7 @@ type PageProps = {
 export default async function MaterialPage({ params }: PageProps) {
   const { handle } = await params;
 
-  const [material, materials] = await Promise.all([
-    getCattleyaMaterialByHandle(handle),
-    getCattleyaMaterials(),
-  ]);
+  const material = await getCattleyaMaterialByHandle(handle);
 
   if (!material) {
     notFound();
@@ -35,10 +31,7 @@ export default async function MaterialPage({ params }: PageProps) {
 
       <MaterialProductsMobile handle={material.handle} />
 
-      <RelatedMaterialsMobile
-        currentHandle={material.handle}
-        materials={materials}
-      />
+      <RelatedMaterialsMobile currentHandle={material.handle} />
     </main>
   );
 }

@@ -13,92 +13,58 @@ import {
 } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 
-import type {
-  ProductPCData,
-  ProductPCMedia,
-} from "./product.types";
+import type { ProductPCData, ProductPCMedia } from "./product.types";
 
 type ProductPCGalleryProps = {
   product: ProductPCData;
   mode?: "main" | "secondary";
   activeIndex: number;
-  onActiveIndexChange: (
-    index: number,
-  ) => void;
+  onActiveIndexChange: (index: number) => void;
 };
 
 type ProductMedia = ProductPCMedia;
 
-function getUniqueMedia(
-  product: ProductPCData,
-): ProductMedia[] {
-  const productMedia =
-    product.media ?? [];
+function getUniqueMedia(product: ProductPCData): ProductMedia[] {
+  const productMedia = product.media ?? [];
 
-  const fallbackImages: ProductMedia[] =
-    [
-      ...(product.featuredImage
-        ? [
-            {
-              type: "image" as const,
-              url: product.featuredImage
-                .url,
-              altText:
-                product.featuredImage
-                  .altText,
-            },
-          ]
-        : []),
+  const fallbackImages: ProductMedia[] = [
+    ...(product.featuredImage
+      ? [
+          {
+            type: "image" as const,
+            url: product.featuredImage.url,
+            altText: product.featuredImage.altText,
+          },
+        ]
+      : []),
 
-      ...(product.images ?? []).map(
-        (image) => ({
-          type: "image" as const,
-          url: image.url,
-          altText: image.altText,
-        }),
-      ),
-    ];
+    ...(product.images ?? []).map((image) => ({
+      type: "image" as const,
+      url: image.url,
+      altText: image.altText,
+    })),
+  ];
 
-  const media =
-    productMedia.length > 0
-      ? productMedia
-      : fallbackImages;
+  const media = productMedia.length > 0 ? productMedia : fallbackImages;
 
   return media.filter(
     (item, index, array) =>
-      array.findIndex(
-        (mediaItem) =>
-          mediaItem.url === item.url,
-      ) === index,
+      array.findIndex((mediaItem) => mediaItem.url === item.url) === index,
   );
 }
 
-function getNeighbourIndex(
-  activeIndex: number,
-  length: number,
-) {
+function getNeighbourIndex(activeIndex: number, length: number) {
   if (length <= 1) return 0;
-
   return (activeIndex + 1) % length;
 }
 
-function getPreviousIndex(
-  activeIndex: number,
-  length: number,
-) {
+function getPreviousIndex(activeIndex: number, length: number) {
   if (length <= 1) return 0;
-
-  return activeIndex === 0
-    ? length - 1
-    : activeIndex - 1;
+  return activeIndex === 0 ? length - 1 : activeIndex - 1;
 }
 
-function getNextIndex(
-  activeIndex: number,
-  length: number,
-) {
+function getNextIndex(activeIndex: number, length: number) {
   if (length <= 1) return 0;
-
   return (activeIndex + 1) % length;
 }
 
@@ -108,55 +74,32 @@ export default function ProductPCGallery({
   activeIndex,
   onActiveIndexChange,
 }: ProductPCGalleryProps) {
-  const [videoPaused, setVideoPaused] =
-    useState(false);
+  const [videoPaused, setVideoPaused] = useState(false);
+  const [videoMuted, setVideoMuted] = useState(true);
 
-  const [videoMuted, setVideoMuted] =
-    useState(true);
-
-  const cleanMedia =
-    getUniqueMedia(product);
+  const cleanMedia = getUniqueMedia(product);
 
   const safeActiveIndex =
-    activeIndex >= 0 &&
-    activeIndex < cleanMedia.length
-      ? activeIndex
-      : 0;
+    activeIndex >= 0 && activeIndex < cleanMedia.length ? activeIndex : 0;
 
-  const activeMedia =
-    cleanMedia[safeActiveIndex] ?? null;
+  const activeMedia = cleanMedia[safeActiveIndex] ?? null;
 
   const secondaryMedia =
-    cleanMedia[
-      getNeighbourIndex(
-        safeActiveIndex,
-        cleanMedia.length,
-      )
-    ] ?? activeMedia;
+    cleanMedia[getNeighbourIndex(safeActiveIndex, cleanMedia.length)] ??
+    activeMedia;
 
   function goToMedia(index: number) {
     onActiveIndexChange(index);
-
     setVideoPaused(false);
     setVideoMuted(true);
   }
 
   function goPrevious() {
-    goToMedia(
-      getPreviousIndex(
-        safeActiveIndex,
-        cleanMedia.length,
-      ),
-    );
+    goToMedia(getPreviousIndex(safeActiveIndex, cleanMedia.length));
   }
 
   function goNext() {
-    goToMedia(
-      getNextIndex(
-        safeActiveIndex,
-        cleanMedia.length,
-      ),
-    );
+    goToMedia(getNextIndex(safeActiveIndex, cleanMedia.length));
   }
 
   if (mode === "secondary") {
@@ -167,30 +110,10 @@ export default function ProductPCGallery({
             {secondaryMedia ? (
               <motion.div
                 key={`secondary-${secondaryMedia.type}-${secondaryMedia.url}`}
-                initial={{
-                  opacity: 0,
-                  x: 70,
-                  scale: 1.04,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  scale: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  x: -70,
-                  scale: 0.98,
-                }}
-                transition={{
-                  duration: 0.72,
-                  ease: [
-                    0.22,
-                    1,
-                    0.36,
-                    1,
-                  ],
-                }}
+                initial={{ opacity: 0, x: 70, scale: 1.04 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -70, scale: 0.98 }}
+                transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0"
               >
                 <MediaRenderer
@@ -215,10 +138,7 @@ export default function ProductPCGallery({
 
             <p className="mt-2 font-serif text-[26px] font-light leading-none tracking-[-0.08em] text-white/85">
               {String(
-                getNeighbourIndex(
-                  safeActiveIndex,
-                  cleanMedia.length,
-                ) + 1,
+                getNeighbourIndex(safeActiveIndex, cleanMedia.length) + 1,
               ).padStart(2, "0")}
             </p>
           </div>
@@ -229,23 +149,15 @@ export default function ProductPCGallery({
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[#fbfaf8]">
-      <div className="absolute left-8 top-8 z-20 flex items-center gap-4">
-        <p className="text-[10px] uppercase tracking-[0.32em] text-black/35">
-          {String(
-            safeActiveIndex + 1,
-          ).padStart(2, "0")}
-
-          <span className="mx-2 text-black/18">
-            /
-          </span>
-
-          {String(
-            cleanMedia.length,
-          ).padStart(2, "0")}
-        </p>
-      </div>
-
       <div className="relative h-[78vh] min-h-[620px] w-full max-w-[780px] overflow-hidden">
+        <div className="absolute left-5 top-5 z-30">
+          <p className="rounded-full border border-black/10 bg-white/75 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-black/35 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+            {String(safeActiveIndex + 1).padStart(2, "0")}
+            <span className="mx-2 text-black/18">/</span>
+            {String(cleanMedia.length).padStart(2, "0")}
+          </p>
+        </div>
+
         <AnimatePresence mode="wait">
           {activeMedia ? (
             <motion.div
@@ -268,15 +180,7 @@ export default function ProductPCGallery({
                 rotate: -1.6,
                 scale: 0.985,
               }}
-              transition={{
-                duration: 0.72,
-                ease: [
-                  0.22,
-                  1,
-                  0.36,
-                  1,
-                ],
-              }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0"
             >
               <MediaRenderer
@@ -290,104 +194,78 @@ export default function ProductPCGallery({
             <div className="h-full w-full bg-black/5" />
           )}
         </AnimatePresence>
-      </div>
 
-      <div className="absolute bottom-8 right-8 z-20 flex items-center gap-3">
-        <button
-          type="button"
-          className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black"
-          aria-label="Agrandir le média"
-        >
-          <ArrowsOutSimple
-            size={17}
-            weight="light"
-          />
-        </button>
+        <div className="absolute bottom-5 right-5 z-30 flex items-center gap-3">
+          <GalleryButton label="Agrandir le média">
+            <ArrowsOutSimple size={17} weight="light" />
+          </GalleryButton>
 
-        {activeMedia?.type ===
-        "video" ? (
-          <>
-            <button
-              type="button"
-              onClick={() =>
-                setVideoPaused(
-                  (value) => !value,
-                )
-              }
-              className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black"
-              aria-label={
-                videoPaused
-                  ? "Lire la vidéo"
-                  : "Mettre la vidéo en pause"
-              }
-            >
-              {videoPaused ? (
-                <Play size={17} />
-              ) : (
-                <Pause size={17} />
-              )}
-            </button>
+          {activeMedia?.type === "video" ? (
+            <>
+              <GalleryButton
+                label={videoPaused ? "Lire la vidéo" : "Mettre la vidéo en pause"}
+                onClick={() => setVideoPaused((value) => !value)}
+              >
+                {videoPaused ? <Play size={17} /> : <Pause size={17} />}
+              </GalleryButton>
 
-            <button
-              type="button"
-              onClick={() =>
-                setVideoMuted(
-                  (value) => !value,
-                )
-              }
-              className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black"
-              aria-label={
-                videoMuted
-                  ? "Activer le son"
-                  : "Couper le son"
-              }
-            >
-              {videoMuted ? (
-                <SpeakerSlash
-                  size={17}
-                />
-              ) : (
-                <SpeakerHigh
-                  size={17}
-                />
-              )}
-            </button>
-          </>
-        ) : null}
+              <GalleryButton
+                label={videoMuted ? "Activer le son" : "Couper le son"}
+                onClick={() => setVideoMuted((value) => !value)}
+              >
+                {videoMuted ? (
+                  <SpeakerSlash size={17} />
+                ) : (
+                  <SpeakerHigh size={17} />
+                )}
+              </GalleryButton>
+            </>
+          ) : null}
 
-        <div className="ml-2 flex items-center gap-3">
-          <button
-            type="button"
+          <GalleryButton
+            label="Média précédent"
             onClick={goPrevious}
-            disabled={
-              cleanMedia.length <= 1
-            }
-            className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-35"
-            aria-label="Média précédent"
+            disabled={cleanMedia.length <= 1}
           >
-            <CaretLeft
-              size={17}
-              weight="light"
-            />
-          </button>
+            <CaretLeft size={17} weight="light" />
+          </GalleryButton>
 
-          <button
-            type="button"
+          <GalleryButton
+            label="Média suivant"
             onClick={goNext}
-            disabled={
-              cleanMedia.length <= 1
-            }
-            className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-35"
-            aria-label="Média suivant"
+            disabled={cleanMedia.length <= 1}
           >
-            <CaretRight
-              size={17}
-              weight="light"
-            />
-          </button>
+            <CaretRight size={17} weight="light" />
+          </GalleryButton>
         </div>
       </div>
     </div>
+  );
+}
+
+type GalleryButtonProps = {
+  label: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+};
+
+function GalleryButton({
+  label,
+  children,
+  onClick,
+  disabled = false,
+}: GalleryButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="grid h-11 w-11 place-items-center border border-black/10 bg-white/80 text-black/55 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-black/25 hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-35"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -396,7 +274,7 @@ type MediaRendererProps = {
   title: string;
   paused?: boolean;
   muted?: boolean;
- compact?: boolean;
+  compact?: boolean;
 };
 
 function MediaRenderer({
@@ -406,16 +284,10 @@ function MediaRenderer({
   muted = true,
   compact = false,
 }: MediaRendererProps) {
-  const videoRef =
-    useRef<HTMLVideoElement | null>(
-      null,
-    );
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (
-      !videoRef.current ||
-      media.type !== "video"
-    ) {
+    if (!videoRef.current || media.type !== "video") {
       return;
     }
 
@@ -424,11 +296,9 @@ function MediaRenderer({
       return;
     }
 
-    videoRef.current
-      .play()
-      .catch(() => {
-        videoRef.current?.pause();
-      });
+    videoRef.current.play().catch(() => {
+      videoRef.current?.pause();
+    });
   }, [paused, media.type]);
 
   if (media.type === "video") {
@@ -441,14 +311,9 @@ function MediaRenderer({
         loop
         playsInline
         preload="metadata"
-        poster={
-          media.poster ??
-          undefined
-        }
+        poster={media.poster ?? undefined}
         className={`h-full w-full ${
-          compact
-            ? "object-cover"
-            : "object-contain"
+          compact ? "object-cover" : "object-contain"
         } drop-shadow-[0_38px_54px_rgba(0,0,0,0.14)]`}
       />
     );
@@ -457,18 +322,12 @@ function MediaRenderer({
   return (
     <Image
       src={media.url}
-      alt={
-        media.altText ?? title
-      }
+      alt={media.altText ?? title}
       fill
       priority
-      sizes={
-        compact ? "330px" : "780px"
-      }
+      sizes={compact ? "330px" : "780px"}
       className={`${
-        compact
-          ? "object-cover"
-          : "object-contain"
+        compact ? "object-cover" : "object-contain"
       } drop-shadow-[0_38px_54px_rgba(0,0,0,0.14)]`}
       unoptimized
     />
